@@ -1,0 +1,54 @@
+package me.theseems.toughwiki.api;
+
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class WikiPageItemConfig {
+    private String type;
+    private String title;
+    private List<String> lore;
+
+    @JsonUnwrapped
+    private Map<String, Object> modifiers;
+
+    public String getType() {
+        return type;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public List<String> getLore() {
+        return lore;
+    }
+
+    @JsonAnySetter
+    public void add(String key, Object value) {
+        if (modifiers == null) {
+            modifiers = new HashMap<>();
+        }
+        modifiers.put(key, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, Object> getModifiers() {
+        return modifiers;
+    }
+
+    @Override
+    public String toString() {
+        return "WikiPageItemConfig{" +
+                "type='" + type + '\'' +
+                ", title='" + title + '\'' +
+                ", lore=" + lore +
+                ", modifiers=" + modifiers +
+                '}';
+    }
+}
