@@ -3,6 +3,7 @@ package me.theseems.toughwiki.paper.commands;
 import me.theseems.toughwiki.BuildConstants;
 import me.theseems.toughwiki.utils.TextUtils;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -35,7 +36,8 @@ public class CommandContainer implements CommandExecutor {
     }
 
     protected void showHelp(Command command, CommandSender sender) {
-        sender.sendMessage(TextUtils.parse("&b&lTough&f&lWiki &7v" + BuildConstants.VERSION + " &r&fby TheSeems<me@theseems.ru>"));
+        sender.sendMessage(LegacyComponentSerializer.legacyAmpersand()
+                .deserialize("&b&lToughWiki &rby TheSeems<me@theseems.ru> &7v%s".formatted(BuildConstants.VERSION)));
         for (SubCommand value : subCommandMap.values()) {
             if (sender.hasPermission(value.getPermission())) {
                 sender.sendMessage(TextUtils

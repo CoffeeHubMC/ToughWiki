@@ -8,5 +8,7 @@ authors: [ TheSeems ]
 description: GUI Wiki plugin with MythicMobs integration
 website: theseems.ru
 commands:
+  toughwiki:
+    description: Plugin's main command
   wiki:
-    description: Main plugin's command
+    description: Opens a page named default

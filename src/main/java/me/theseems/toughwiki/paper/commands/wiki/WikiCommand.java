@@ -1,5 +1,6 @@
 package me.theseems.toughwiki.paper.commands.wiki;
 
+import me.theseems.toughwiki.BuildConstants;
 import me.theseems.toughwiki.paper.commands.CommandContainer;
 
 public class WikiCommand extends CommandContainer {
@@ -7,6 +8,9 @@ public class WikiCommand extends CommandContainer {
         add(new WikiShowPageCommand());
         add(new WikiReloadCommand());
         add(new WikiListPagesCommand());
-        add(new WikiDebugCommand());
+
+        if (BuildConstants.DEV_BUILD) {
+            add(new WikiDebugCommand());
+        }
     }
 }
