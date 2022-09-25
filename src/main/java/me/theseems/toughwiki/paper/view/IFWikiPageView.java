@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -123,6 +124,9 @@ public class IFWikiPageView implements WikiPageView {
             if (getGoto(content) != null) {
                 currentAction = Action.GOTO;
             }
+            if (getCommand(content) != null) {
+                currentAction = Action.COMMAND;
+            }
 
             if (currentAction != null) {
                 switch (currentAction) {
@@ -156,6 +160,11 @@ public class IFWikiPageView implements WikiPageView {
                                 .show(player.getUniqueId());
                     };
 
+                    case COMMAND -> action = () -> {
+                        player.closeInventory();
+                        player.performCommand(Objects.requireNonNull(getCommand(content)));
+                    };
+
                     case CLOSE -> action = player::closeInventory;
 
                     default -> throw new IllegalStateException("Action is unsupported '" + action + "'");
@@ -165,7 +174,6 @@ public class IFWikiPageView implements WikiPageView {
 
             Runnable finalAction = action;
             GuiItem guiItem = new GuiItem(stack, inventoryClickEvent -> {
-                System.out.println("CLICK CLICK MOTHERFUCKER");
                 try {
                     finalAction.run();
                 } finally {
@@ -174,7 +182,6 @@ public class IFWikiPageView implements WikiPageView {
             });
 
             int slot = getSlot(content);
-            ToughWiki.getPluginLogger().info("Add item '" + content + "' to slot " + slot);
             pane.removeItem(slot % 9, slot / 9);
             pane.addItem(guiItem, slot % 9, slot / 9);
         }
@@ -227,6 +234,20 @@ public class IFWikiPageView implements WikiPageView {
             if (!(action instanceof String)) {
                 ToughWiki.getPluginLogger()
                         .warning("Could not find a target for goto: " + config);
+            } else {
+                return (String) action;
+            }
+        }
+
+        return null;
+    }
+
+    private String getCommand(WikiPageItemConfig config) {
+        if (config.getModifiers() != null && config.getModifiers().containsKey("command")) {
+            Object action = config.getModifiers().get("command");
+            if (!(action instanceof String)) {
+                ToughWiki.getPluginLogger()
+                        .warning("Could not parse a command: " + config);
             } else {
                 return (String) action;
             }

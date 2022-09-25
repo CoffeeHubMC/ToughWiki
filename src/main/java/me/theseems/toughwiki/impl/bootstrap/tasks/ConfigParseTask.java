@@ -9,8 +9,11 @@ import me.theseems.toughwiki.impl.bootstrap.Phase;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 public class ConfigParseTask extends BootstrapTask {
     private final File configFile;
@@ -34,26 +37,27 @@ public class ConfigParseTask extends BootstrapTask {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         ToughWikiConfig wikiConfig = mapper.readValue(configFile, ToughWikiConfig.class);
 
-        File pagesFolder = new File(configFile.getParentFile(), "pages");
-        File[] additionalPages = pagesFolder.listFiles();
-        if (pagesFolder.exists() && additionalPages != null) {
-            for (File file : additionalPages) {
-                if (file.getName().endsWith(".yml")) {
-                    FlatToughWikiConfig flatToughWikiConfig = mapper.readValue(file, FlatToughWikiConfig.class);
-                    flatToughWikiConfig.getPages().forEach((s, config) -> {
-                        if (wikiConfig.getPages().containsKey(s)) {
-                            throw new IllegalStateException(
-                                    "File " + file + " contains a page that is already included in the main config");
+        try (Stream<Path> stream = Files.walk(new File(configFile.getParentFile(), "pages").toPath())) {
+            stream.filter(Files::isRegularFile)
+                    .filter(path -> path.toString().endsWith(".yml"))
+                    .forEach(path -> {
+                        File file = path.toFile();
+                        FlatToughWikiConfig flatToughWikiConfig;
+                        try {
+                            flatToughWikiConfig = mapper.readValue(file, FlatToughWikiConfig.class);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
                         }
+                        flatToughWikiConfig.getPages().forEach((name, config) -> {
+                            if (wikiConfig.getPages().containsKey(name)) {
+                                throw new IllegalStateException(
+                                        "File " + file + " contains a page that is present at least twice");
+                            }
 
-                        logger.info("Imported " + s + " (" + config + ")");
-                        wikiConfig.getPages().put(s, config);
+                            wikiConfig.getPages().put(name, config);
+                            logger.info("Included %s (%s)".formatted(name, path));
+                        });
                     });
-
-                    logger.info("Imported %d page(s) from %s"
-                            .formatted(flatToughWikiConfig.getPages().size(), file.getName()));
-                }
-            }
         }
 
         consumer.accept(wikiConfig);
