@@ -1,6 +1,5 @@
 package me.theseems.toughwiki.impl.view;
 
-import me.theseems.toughwiki.ToughWiki;
 import me.theseems.toughwiki.api.WikiPage;
 import me.theseems.toughwiki.api.view.WikiPageView;
 import me.theseems.toughwiki.api.view.WikiPageViewManager;
@@ -23,8 +22,6 @@ public class SimpleWikiPageViewManager implements WikiPageViewManager {
             throw new IllegalStateException("View for '" + wikiPageView.getPage().getName() + "' is already stored");
         }
 
-        ToughWiki.getPluginLogger().info("Registered view '%s' for page '%s'"
-                .formatted(wikiPageView.getClass().getSimpleName(), wikiPageView.getPage().getName()));
         viewMap.put(wikiPageView.getPage().getName(), wikiPageView);
     }
 
