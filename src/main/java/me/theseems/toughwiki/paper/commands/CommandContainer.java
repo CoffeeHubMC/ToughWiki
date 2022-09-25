@@ -29,6 +29,11 @@ public class CommandContainer implements CommandExecutor {
             return true;
         }
 
+        if (!sender.hasPermission(subCommandMap.get(args[0]).getPermission())) {
+            showBanner(sender);
+            return true;
+        }
+
         String[] mappedArgs = Arrays.stream(args).skip(1).toArray(String[]::new);
         subCommandMap.get(args[0].toLowerCase()).execute(sender, mappedArgs);
 
@@ -36,8 +41,7 @@ public class CommandContainer implements CommandExecutor {
     }
 
     protected void showHelp(Command command, CommandSender sender) {
-        sender.sendMessage(LegacyComponentSerializer.legacyAmpersand()
-                .deserialize("&b&lToughWiki &rby TheSeems<me@theseems.ru> &7v%s".formatted(BuildConstants.VERSION)));
+        showBanner(sender);
         for (SubCommand value : subCommandMap.values()) {
             if (sender.hasPermission(value.getPermission())) {
                 sender.sendMessage(TextUtils
@@ -45,6 +49,11 @@ public class CommandContainer implements CommandExecutor {
                         .clickEvent(ClickEvent.suggestCommand("/" + command.getLabel() + " " + value.getLabel())));
             }
         }
+    }
+
+    protected void showBanner(CommandSender sender) {
+        sender.sendMessage(LegacyComponentSerializer.legacyAmpersand()
+                .deserialize("&b&lToughWiki &rby TheSeems<me@theseems.ru> &7v%s".formatted(BuildConstants.VERSION)));
     }
 
     protected void add(SubCommand subCommand) {

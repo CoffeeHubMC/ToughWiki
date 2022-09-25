@@ -37,7 +37,12 @@ public class ConfigParseTask extends BootstrapTask {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         ToughWikiConfig wikiConfig = mapper.readValue(configFile, ToughWikiConfig.class);
 
-        try (Stream<Path> stream = Files.walk(new File(configFile.getParentFile(), "pages").toPath())) {
+        File pagesFolder = new File(configFile.getParentFile(), "pages");
+        if (!pagesFolder.exists()) {
+            pagesFolder.mkdir();
+        }
+
+        try (Stream<Path> stream = Files.walk(pagesFolder.toPath())) {
             stream.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(".yml"))
                     .forEach(path -> {
