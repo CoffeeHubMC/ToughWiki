@@ -7,6 +7,8 @@ import me.theseems.toughwiki.impl.bootstrap.tasks.*;
 import me.theseems.toughwiki.impl.bootstrap.tasks.itemfactory.ItemFactoryInitializationTask;
 import me.theseems.toughwiki.paper.item.ItemFactory;
 import me.theseems.toughwiki.paper.task.PaperCommandRegisterTask;
+import me.theseems.toughwiki.paper.task.PaperListenerRegisterTask;
+import me.theseems.toughwiki.paper.task.PaperListenerUnregisterTask;
 import me.theseems.toughwiki.paper.task.PaperRegisterViewTask;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -31,8 +33,11 @@ public final class ToughWiki extends JavaPlugin {
         bootstrap.add(new PageValidateTask());
         bootstrap.add(new PageRegisterTask());
         bootstrap.add(new PaperRegisterViewTask());
-        bootstrap.add(new PaperCommandRegisterTask(plugin));
 
+        bootstrap.add(new PaperCommandRegisterTask(plugin));
+        bootstrap.add(new PaperListenerRegisterTask(plugin));
+
+        bootstrap.add(new PaperListenerUnregisterTask());
         bootstrap.add(new PageClearTask());
 
         bootstrap.execute(Phase.PRE_CONFIG);
@@ -67,5 +72,9 @@ public final class ToughWiki extends JavaPlugin {
 
     public static ToughWikiBootstrap getBootstrap() {
         return bootstrap;
+    }
+
+    public static ToughWiki getPlugin() {
+        return plugin;
     }
 }

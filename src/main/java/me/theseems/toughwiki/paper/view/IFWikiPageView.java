@@ -28,6 +28,14 @@ public class IFWikiPageView implements WikiPageView {
     private static class PlayerGUIContext {
         private ZonedDateTime lastUpdate;
         private ChestGui chestGui;
+
+        @Override
+        public String toString() {
+            return "PlayerGUIContext{" +
+                    "lastUpdate=" + lastUpdate +
+                    ", chestGui=" + chestGui +
+                    '}';
+        }
     }
 
     private final String wikiPageName;
@@ -79,12 +87,15 @@ public class IFWikiPageView implements WikiPageView {
             return;
         }
 
-        PlayerGUIContext context = playerGUIMap.get(player);
-        for (HumanEntity viewer : context.chestGui.getViewers()) {
-            viewer.closeInventory();
-        }
-
         playerGUIMap.remove(player);
+    }
+
+    @Override
+    public void dispose() {
+        playerGUIMap.forEach((uuid, playerGUIContext) -> {
+            dispose(uuid);
+            playerGUIMap.remove(uuid);
+        });
     }
 
     private PlayerGUIContext makeContext(Player player) {
@@ -154,17 +165,24 @@ public class IFWikiPageView implements WikiPageView {
 
             Runnable finalAction = action;
             GuiItem guiItem = new GuiItem(stack, inventoryClickEvent -> {
-                inventoryClickEvent.setCancelled(true);
-                finalAction.run();
+                System.out.println("CLICK CLICK MOTHERFUCKER");
+                try {
+                    finalAction.run();
+                } finally {
+                    inventoryClickEvent.setCancelled(true);
+                }
             });
 
             int slot = getSlot(content);
+            ToughWiki.getPluginLogger().info("Add item '" + content + "' to slot " + slot);
+            pane.removeItem(slot % 9, slot / 9);
             pane.addItem(guiItem, slot % 9, slot / 9);
         }
 
         chestGui.addPane(pane);
         chestGui.setOnGlobalClick(inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
         chestGui.setOnGlobalDrag(inventoryDragEvent -> inventoryDragEvent.setCancelled(true));
+        chestGui.update();
 
         return chestGui;
     }

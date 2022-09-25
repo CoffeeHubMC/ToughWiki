@@ -28,4 +28,14 @@ public class ToughWikiConfig {
     public WikiPageInfo getContent() {
         return content;
     }
+
+    @Override
+    public String toString() {
+        return "ToughWikiConfig{" +
+                "pages=" + pages +
+                ", modifiers=" + modifiers +
+                ", parent='" + parent + '\'' +
+                ", content=" + content +
+                '}';
+    }
 }

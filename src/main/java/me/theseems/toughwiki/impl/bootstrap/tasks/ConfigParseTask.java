@@ -2,6 +2,7 @@ package me.theseems.toughwiki.impl.bootstrap.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import me.theseems.toughwiki.config.FlatToughWikiConfig;
 import me.theseems.toughwiki.config.ToughWikiConfig;
 import me.theseems.toughwiki.impl.bootstrap.BootstrapTask;
 import me.theseems.toughwiki.impl.bootstrap.Phase;
@@ -30,6 +31,31 @@ public class ConfigParseTask extends BootstrapTask {
             configFile.createNewFile();
         }
 
-        consumer.accept(new ObjectMapper(new YAMLFactory()).readValue(configFile, ToughWikiConfig.class));
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        ToughWikiConfig wikiConfig = mapper.readValue(configFile, ToughWikiConfig.class);
+
+        File pagesFolder = new File(configFile.getParentFile(), "pages");
+        File[] additionalPages = pagesFolder.listFiles();
+        if (pagesFolder.exists() && additionalPages != null) {
+            for (File file : additionalPages) {
+                if (file.getName().endsWith(".yml")) {
+                    FlatToughWikiConfig flatToughWikiConfig = mapper.readValue(file, FlatToughWikiConfig.class);
+                    flatToughWikiConfig.getPages().forEach((s, config) -> {
+                        if (wikiConfig.getPages().containsKey(s)) {
+                            throw new IllegalStateException(
+                                    "File " + file + " contains a page that is already included in the main config");
+                        }
+
+                        logger.info("Imported " + s + " (" + config + ")");
+                        wikiConfig.getPages().put(s, config);
+                    });
+
+                    logger.info("Imported %d page(s) from %s"
+                            .formatted(flatToughWikiConfig.getPages().size(), file.getName()));
+                }
+            }
+        }
+
+        consumer.accept(wikiConfig);
     }
 }

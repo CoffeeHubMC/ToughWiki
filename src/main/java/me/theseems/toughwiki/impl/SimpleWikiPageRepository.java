@@ -3,6 +3,7 @@ package me.theseems.toughwiki.impl;
 import me.theseems.toughwiki.api.ToughWikiAPI;
 import me.theseems.toughwiki.api.WikiPage;
 import me.theseems.toughwiki.api.WikiPageRepository;
+import me.theseems.toughwiki.api.view.WikiPageView;
 import me.theseems.toughwiki.api.view.WikiPageViewManager;
 
 import java.util.Collection;
@@ -26,7 +27,9 @@ public class SimpleWikiPageRepository implements WikiPageRepository {
     public void dispose(String name) {
         WikiPage wikiPage = wikiPageMap.get(name);
         WikiPageViewManager viewManager = ToughWikiAPI.getInstance().getViewManager();
-        viewManager.getView(wikiPage).ifPresent(viewManager::dispose);
+        viewManager.getView(wikiPage)
+                .map(WikiPageView::getName)
+                .ifPresent(viewManager::dispose);
         wikiPageMap.remove(name);
     }
 

@@ -11,4 +11,5 @@ public interface WikiPageView {
 
     void show(UUID player);
     void dispose(UUID player);
+    void dispose();
 }

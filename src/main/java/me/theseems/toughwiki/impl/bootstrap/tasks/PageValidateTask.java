@@ -21,7 +21,7 @@ public class PageValidateTask extends BootstrapTask {
     }
 
     private boolean checkPage(ToughWikiConfig config, String name, String previous) {
-        if (config.getParent() == null) {
+        if (config == null || config.getParent() == null) {
             return true;
         }
         if (used.contains(name)) {

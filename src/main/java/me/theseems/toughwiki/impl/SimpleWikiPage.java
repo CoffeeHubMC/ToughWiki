@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 public class SimpleWikiPage implements WikiPage {
-    private String name;
+    private final String name;
     private WikiPage parent;
     private Collection<WikiPage> children;
     private WikiPageInfo info;
@@ -50,4 +50,6 @@ public class SimpleWikiPage implements WikiPage {
     public String getName() {
         return name;
     }
+
+
 }
