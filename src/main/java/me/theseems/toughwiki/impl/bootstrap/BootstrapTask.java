@@ -1,6 +1,5 @@
 package me.theseems.toughwiki.impl.bootstrap;
 
-import java.io.IOException;
 import java.util.logging.Logger;
 
 public abstract class BootstrapTask {

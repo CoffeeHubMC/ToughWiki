@@ -9,9 +9,9 @@ import me.theseems.toughwiki.paper.listener.TabCompleteListener;
 import java.util.logging.Logger;
 
 public class PaperListenerRegisterTask extends BootstrapTask {
-    private final ToughWiki toughWiki;
     public static TabCompleteListener tabCompleteListener;
     public static PlayerLeaveListener playerLeaveListener;
+    private final ToughWiki toughWiki;
 
     public PaperListenerRegisterTask(ToughWiki toughWiki) {
         super("paperCommandRegister", Phase.POST_CONFIG);

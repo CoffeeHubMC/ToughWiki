@@ -7,7 +7,6 @@ import java.util.Map;
 
 public class ToughWikiConfig {
     private Map<String, ToughWikiConfig> pages;
-    private Map<String, Object> modifiers;
     private String parent;
 
     @JsonUnwrapped
@@ -15,10 +14,6 @@ public class ToughWikiConfig {
 
     public Map<String, ToughWikiConfig> getPages() {
         return pages;
-    }
-
-    public Map<String, Object> getModifiers() {
-        return modifiers;
     }
 
     public String getParent() {
@@ -33,7 +28,6 @@ public class ToughWikiConfig {
     public String toString() {
         return "ToughWikiConfig{" +
                 "pages=" + pages +
-                ", modifiers=" + modifiers +
                 ", parent='" + parent + '\'' +
                 ", content=" + content +
                 '}';

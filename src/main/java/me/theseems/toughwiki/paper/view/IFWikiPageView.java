@@ -1,5 +1,8 @@
 package me.theseems.toughwiki.paper.view;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.stefvanschie.inventoryframework.adventuresupport.ComponentHolder;
 import com.github.stefvanschie.inventoryframework.adventuresupport.TextHolder;
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
@@ -9,42 +12,34 @@ import me.theseems.toughwiki.ToughWiki;
 import me.theseems.toughwiki.api.ToughWikiAPI;
 import me.theseems.toughwiki.api.WikiPage;
 import me.theseems.toughwiki.api.WikiPageItemConfig;
+import me.theseems.toughwiki.api.view.Action;
 import me.theseems.toughwiki.api.view.WikiPageView;
+import me.theseems.toughwiki.paper.view.action.IFWikiActionSender;
 import me.theseems.toughwiki.utils.TextUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class IFWikiPageView implements WikiPageView {
-    public static final Duration PER_PLAYER_CACHE_TTL = Duration.ofSeconds(120L);
-
-    private static class PlayerGUIContext {
-        private ZonedDateTime lastUpdate;
-        private ChestGui chestGui;
-
-        @Override
-        public String toString() {
-            return "PlayerGUIContext{" +
-                    "lastUpdate=" + lastUpdate +
-                    ", chestGui=" + chestGui +
-                    '}';
-        }
-    }
-
+    public static final Duration PER_PLAYER_CACHE_TTL = Duration.ofSeconds(5L);
     private final String wikiPageName;
     private final Map<UUID, PlayerGUIContext> playerGUIMap;
-
-    public IFWikiPageView(String wikiPageName) {
+    private final ObjectNode defaultContext;
+    public IFWikiPageView(String wikiPageName, ObjectNode defaultContext) {
         this.wikiPageName = wikiPageName;
         this.playerGUIMap = new ConcurrentHashMap<>();
+        this.defaultContext = defaultContext == null ? new ObjectNode(new ObjectMapper().getNodeFactory()) : defaultContext;
+        ToughWiki.getPluginLogger().info("Oi bruv i fancy printing my brilliant global context: " + this.defaultContext);
     }
 
     @Override
@@ -69,10 +64,10 @@ public class IFWikiPageView implements WikiPageView {
             return;
         }
 
-        PlayerGUIContext context = playerGUIMap.computeIfAbsent(player, uuid -> makeContext(onlinePlayer));
+        PlayerGUIContext context = playerGUIMap.computeIfAbsent(player, uuid -> makeContext(onlinePlayer, null));
         if (Duration.between(context.lastUpdate, ZonedDateTime.now()).compareTo(PER_PLAYER_CACHE_TTL) > 0) {
             dispose(player);
-            context = makeContext(onlinePlayer);
+            context = makeContext(onlinePlayer, context);
         }
 
         for (HumanEntity viewer : context.chestGui.getViewers()) {
@@ -99,14 +94,33 @@ public class IFWikiPageView implements WikiPageView {
         });
     }
 
-    private PlayerGUIContext makeContext(Player player) {
+    @Override
+    public ObjectNode getContext(UUID player) {
+        if (!playerGUIMap.containsKey(player)) {
+            return defaultContext;
+        }
+
+        return playerGUIMap.get(player).context;
+    }
+
+    @Override
+    public ObjectNode getGlobalContext() {
+        return defaultContext;
+    }
+
+    private PlayerGUIContext makeContext(Player player, PlayerGUIContext previous) {
         PlayerGUIContext newContext = new PlayerGUIContext();
         newContext.lastUpdate = ZonedDateTime.now();
-        newContext.chestGui = makeChestGUI(player);
+        if (previous != null) {
+            newContext.context = previous.context;
+        } else {
+            newContext.context = new ObjectNode(new ObjectMapper().getNodeFactory());
+        }
+        newContext.chestGui = makeChestGUI(player, newContext.context);
         return newContext;
     }
 
-    private ChestGui makeChestGUI(Player player) {
+    private ChestGui makeChestGUI(Player player, ObjectNode context) {
         WikiPage wikiPage = getPage();
 
         int size = wikiPage.getInfo().getSize();
@@ -115,10 +129,11 @@ public class IFWikiPageView implements WikiPageView {
         ChestGui chestGui = new ChestGui(size, textHolder);
 
         StaticPane pane = new StaticPane(0, 0, 9, size);
+        int maxLines = getMaxLines();
+
         for (WikiPageItemConfig content : wikiPage.getInfo().getItems()) {
             ItemStack stack = ToughWiki.getItemFactory().produce(player, content);
-            Runnable action = () -> {
-            };
+            int slot = getSlot(content);
 
             Action currentAction = getAction(content);
             if (getGoto(content) != null) {
@@ -128,60 +143,43 @@ public class IFWikiPageView implements WikiPageView {
                 currentAction = Action.COMMAND;
             }
 
-            if (currentAction != null) {
-                switch (currentAction) {
-                    case BACK -> action = () -> {
-                        if (getPage().getParent().isPresent()) {
-                            try {
-                                ToughWikiAPI.getInstance().getViewManager()
-                                        .getView(getPage().getParent().get())
-                                        .orElseThrow(() -> new IllegalStateException(
-                                                "No parent view found for player '%s' and page '%s'"
-                                                        .formatted(player.getName(), getPage().getName())))
-                                        .show(player.getUniqueId());
-                            } catch (Throwable e) {
-                                throw new RuntimeException(e);
-                            }
-                        } else {
-                            player.closeInventory();
-                        }
-                    };
+            Action finalCurrentAction = currentAction;
+            if (slot != -1) {
+                int currentLinesOffset = Optional.ofNullable(context.get("scroll-offset-item-" + slot))
+                        .filter(JsonNode::isInt)
+                        .map(JsonNode::asInt)
+                        .orElse(0);
 
-                    case GOTO -> action = () -> {
-                        WikiPage target = ToughWikiAPI.getInstance()
-                                .getPageRepository()
-                                .getPage(getGoto(content))
-                                .orElseThrow(() -> new IllegalStateException("Target page '" + getGoto(content) + "' is not found"));
-
-                        ToughWikiAPI.getInstance()
-                                .getViewManager()
-                                .getView(target)
-                                .orElseThrow(() -> new IllegalStateException("No target (goto) view found for page '" + getGoto(content) + "'"))
-                                .show(player.getUniqueId());
-                    };
-
-                    case COMMAND -> action = () -> {
-                        player.closeInventory();
-                        player.performCommand(Objects.requireNonNull(getCommand(content)));
-                    };
-
-                    case CLOSE -> action = player::closeInventory;
-
-                    default -> throw new IllegalStateException("Action is unsupported '" + action + "'");
+                ItemMeta meta = stack.getItemMeta();
+                if (meta.lore() != null && meta.lore().size() > maxLines) {
+                    Stream<Component> componentStream = Objects.requireNonNull(meta.lore()).stream()
+                            .skip(currentLinesOffset)
+                            .limit(maxLines);
+                    if (currentAction == Action.SCROLL_ITEM && getSeeMore() != null) {
+                        componentStream = Stream.concat(componentStream, getSeeMore().stream());
+                    }
+                    meta.lore(componentStream.collect(Collectors.toList()));
                 }
+
+                stack.setItemMeta(meta);
             }
 
-
-            Runnable finalAction = action;
-            GuiItem guiItem = new GuiItem(stack, inventoryClickEvent -> {
+            GuiItem guiItem = new GuiItem(stack);
+            guiItem.setAction(inventoryClickEvent -> {
                 try {
-                    finalAction.run();
+                    ToughWikiAPI.getInstance().getActionEmitter().emit(
+                            finalCurrentAction,
+                            new IFWikiActionSender(this,
+                                    content,
+                                    chestGui,
+                                    guiItem,
+                                    getSlot(content),
+                                    inventoryClickEvent));
                 } finally {
                     inventoryClickEvent.setCancelled(true);
                 }
             });
 
-            int slot = getSlot(content);
             pane.removeItem(slot % 9, slot / 9);
             pane.addItem(guiItem, slot % 9, slot / 9);
         }
@@ -196,28 +194,50 @@ public class IFWikiPageView implements WikiPageView {
 
     private int getSlot(WikiPageItemConfig config) {
         if (config.getModifiers() != null && config.getModifiers().containsKey("slot")) {
-            Object slot = config.getModifiers().get("slot");
-            if (!(slot instanceof Number)) {
-                ToughWiki.getPluginLogger()
-                        .warning("Could not find a slot for the item config (incorrect value): " + config);
-            } else {
-                return ((Number) slot).intValue();
+            JsonNode slot = config.getModifiers().get("slot");
+            if (slot.isNumber()) {
+                return slot.intValue();
             }
         }
-
-        ToughWiki.getPluginLogger().warning("Could not find a slot for the item config: " + config);
         return -1;
+    }
+
+    public int getMaxLines() {
+        return Optional.ofNullable(defaultContext.get("maxLines"))
+                .filter(JsonNode::isInt)
+                .map(JsonNode::asInt).orElse(6);
+    }
+
+    public List<Component> getSeeMore() {
+        JsonNode array = Optional.ofNullable(defaultContext.get("seeMoreLines"))
+                .filter(JsonNode::isArray)
+                .orElse(null);
+
+        if (array == null) {
+            return null;
+        }
+
+        List<Component> seeMoreList = new ArrayList<>();
+        array.forEach(jsonElement -> {
+            if (!jsonElement.isTextual()) {
+                throw new IllegalStateException("seeMoreLines must contain only strings");
+            }
+
+            seeMoreList.add(TextUtils.parse(jsonElement.asText()));
+        });
+
+        return seeMoreList;
     }
 
     private Action getAction(WikiPageItemConfig config) {
         if (config.getModifiers() != null && config.getModifiers().containsKey("action")) {
-            Object action = config.getModifiers().get("action");
-            if (!(action instanceof String)) {
+            JsonNode action = config.getModifiers().get("action");
+            if (!action.isTextual()) {
                 ToughWiki.getPluginLogger()
-                        .warning("Could not find an action for the item config (incorrect value): " + config);
+                        .warning("Could not find an action for the item config (incorrect value): " + config + " (" + action + ")");
             } else {
                 try {
-                    return Action.valueOf((String) action);
+                    return Action.valueOf(action.asText());
                 } catch (IllegalArgumentException e) {
                     ToughWiki.getPluginLogger()
                             .warning("Invalid action specified for config " + config + ": '" + action + "'");
@@ -230,12 +250,12 @@ public class IFWikiPageView implements WikiPageView {
 
     private String getGoto(WikiPageItemConfig config) {
         if (config.getModifiers() != null && config.getModifiers().containsKey("goto")) {
-            Object action = config.getModifiers().get("goto");
-            if (!(action instanceof String)) {
+            JsonNode action = config.getModifiers().get("goto");
+            if (!action.isTextual()) {
                 ToughWiki.getPluginLogger()
-                        .warning("Could not find a target for goto: " + config);
+                        .warning("Could not find a target for goto: " + config + " (" + action + ")");
             } else {
-                return (String) action;
+                return action.asText();
             }
         }
 
@@ -244,15 +264,29 @@ public class IFWikiPageView implements WikiPageView {
 
     private String getCommand(WikiPageItemConfig config) {
         if (config.getModifiers() != null && config.getModifiers().containsKey("command")) {
-            Object action = config.getModifiers().get("command");
-            if (!(action instanceof String)) {
+            JsonNode action = config.getModifiers().get("command");
+            if (!action.isTextual()) {
                 ToughWiki.getPluginLogger()
-                        .warning("Could not parse a command: " + config);
+                        .warning("Could not parse a command: " + config + " (" + action + ")");
             } else {
-                return (String) action;
+                return action.asText();
             }
         }
 
         return null;
+    }
+
+    private static class PlayerGUIContext {
+        private ZonedDateTime lastUpdate;
+        private ChestGui chestGui;
+        private ObjectNode context;
+
+        @Override
+        public String toString() {
+            return "PlayerGUIContext{" +
+                    "lastUpdate=" + lastUpdate +
+                    ", chestGui=" + chestGui +
+                    '}';
+        }
     }
 }

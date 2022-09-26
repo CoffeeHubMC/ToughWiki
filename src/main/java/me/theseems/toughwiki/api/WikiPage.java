@@ -5,6 +5,7 @@ import java.util.Optional;
 
 public interface WikiPage {
     Optional<WikiPage> getParent();
+
     Collection<WikiPage> getChildren();
 
     WikiPageInfo getInfo();

@@ -17,9 +17,9 @@ public class CustomModelDataTransformer extends ItemTransformer {
     public void transform(Player player, ItemInitializer initializer, ItemStack stack, WikiPageItemConfig config) {
         if (config.getModifiers() != null
                 && config.getModifiers().containsKey("customModelData")
-                && config.getModifiers().get("customModelData") instanceof Number) {
+                && config.getModifiers().get("customModelData").isNumber()) {
             ItemMeta meta = stack.getItemMeta();
-            meta.setCustomModelData(((Number) config.getModifiers().get("customModelData")).intValue());
+            meta.setCustomModelData(config.getModifiers().get("customModelData").intValue());
             stack.setItemMeta(meta);
         }
     }

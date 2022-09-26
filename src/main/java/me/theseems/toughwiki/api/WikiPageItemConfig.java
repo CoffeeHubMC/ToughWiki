@@ -2,8 +2,8 @@ package me.theseems.toughwiki.api;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +15,7 @@ public class WikiPageItemConfig {
     private List<String> lore;
 
     @JsonUnwrapped
-    private Map<String, Object> modifiers;
+    private Map<String, JsonNode> modifiers;
 
     public String getType() {
         return type;
@@ -30,7 +30,7 @@ public class WikiPageItemConfig {
     }
 
     @JsonAnySetter
-    public void add(String key, Object value) {
+    public void add(String key, JsonNode value) {
         if (modifiers == null) {
             modifiers = new HashMap<>();
         }
@@ -38,7 +38,7 @@ public class WikiPageItemConfig {
     }
 
     @JsonAnyGetter
-    public Map<String, Object> getModifiers() {
+    public Map<String, JsonNode> getModifiers() {
         return modifiers;
     }
 

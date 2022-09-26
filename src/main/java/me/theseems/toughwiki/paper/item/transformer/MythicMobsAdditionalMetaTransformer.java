@@ -5,7 +5,6 @@ import me.theseems.toughwiki.paper.item.ItemInitializer;
 import me.theseems.toughwiki.paper.item.ItemTransformer;
 import me.theseems.toughwiki.paper.item.initializer.MythicMobsItemInitializer;
 import me.theseems.toughwiki.utils.TextUtils;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -27,9 +26,7 @@ public class MythicMobsAdditionalMetaTransformer extends ItemTransformer {
             ItemMeta meta = stack.getItemMeta();
             meta.lore(Stream.concat(
                     Optional.ofNullable(meta.lore()).orElse(List.of()).stream(),
-                    Stream.concat(
-                            Stream.of(Component.empty()),
-                            config.getLore().stream().map(TextUtils::parse))
+                    config.getLore().stream().map(TextUtils::parse)
             ).collect(Collectors.toList()));
             stack.setItemMeta(meta);
         }

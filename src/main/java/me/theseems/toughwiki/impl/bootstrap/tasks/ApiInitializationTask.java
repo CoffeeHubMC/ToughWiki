@@ -1,6 +1,7 @@
 package me.theseems.toughwiki.impl.bootstrap.tasks;
 
 import me.theseems.toughwiki.api.ToughWikiAPI;
+import me.theseems.toughwiki.impl.SimpleActionEmitter;
 import me.theseems.toughwiki.impl.SimpleWikiPageRepository;
 import me.theseems.toughwiki.impl.bootstrap.BootstrapTask;
 import me.theseems.toughwiki.impl.bootstrap.Phase;
@@ -15,6 +16,6 @@ public class ApiInitializationTask extends BootstrapTask {
 
     @Override
     public void run(Logger logger) {
-        new ToughWikiAPI(new SimpleWikiPageViewManager(), new SimpleWikiPageRepository());
+        new ToughWikiAPI(new SimpleWikiPageViewManager(), new SimpleWikiPageRepository(), new SimpleActionEmitter());
     }
 }

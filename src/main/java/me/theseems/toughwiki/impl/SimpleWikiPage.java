@@ -19,21 +19,13 @@ public class SimpleWikiPage implements WikiPage {
         this.info = info;
     }
 
-    public void setParent(WikiPage parent) {
-        this.parent = parent;
-    }
-
-    public void setChildren(Collection<WikiPage> children) {
-        this.children = children;
-    }
-
-    public void setInfo(WikiPageInfo info) {
-        this.info = info;
-    }
-
     @Override
     public Optional<WikiPage> getParent() {
         return Optional.ofNullable(parent);
+    }
+
+    public void setParent(WikiPage parent) {
+        this.parent = parent;
     }
 
     @Override
@@ -41,9 +33,17 @@ public class SimpleWikiPage implements WikiPage {
         return children;
     }
 
+    public void setChildren(Collection<WikiPage> children) {
+        this.children = children;
+    }
+
     @Override
     public WikiPageInfo getInfo() {
         return info;
+    }
+
+    public void setInfo(WikiPageInfo info) {
+        this.info = info;
     }
 
     @Override

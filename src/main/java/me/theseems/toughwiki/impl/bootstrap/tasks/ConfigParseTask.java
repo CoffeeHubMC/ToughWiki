@@ -10,7 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -36,6 +37,9 @@ public class ConfigParseTask extends BootstrapTask {
 
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         ToughWikiConfig wikiConfig = mapper.readValue(configFile, ToughWikiConfig.class);
+
+        System.out.println("WIKI CONFIG " + wikiConfig);
+        wikiConfig.getPages().forEach((s, config) -> System.out.println("Name '" + s + "' has a context of " + config.getContent().getModifiers()));
 
         File pagesFolder = new File(configFile.getParentFile(), "pages");
         if (!pagesFolder.exists()) {

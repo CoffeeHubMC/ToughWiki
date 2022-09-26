@@ -82,7 +82,7 @@ def templateSource = file('src/main/templates')
 def templateDest = layout.buildDirectory.dir('generated/sources/templates')
 def generateTemplates = tasks.register('generateTemplates', Copy) { task ->
     def props = [
-            'version': project.version,
+            'version' : project.version,
             'devBuild': project.ext.devBuild
     ]
     task.inputs.properties props

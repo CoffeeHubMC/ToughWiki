@@ -3,7 +3,6 @@ package me.theseems.toughwiki.config;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import me.theseems.toughwiki.api.WikiPageInfo;
 
 import java.util.HashMap;
 import java.util.Map;

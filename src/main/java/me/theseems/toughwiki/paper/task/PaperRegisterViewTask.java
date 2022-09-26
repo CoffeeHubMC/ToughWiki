@@ -16,7 +16,8 @@ public class PaperRegisterViewTask extends BootstrapTask {
     @Override
     public void run(Logger logger) {
         for (WikiPage page : ToughWikiAPI.getInstance().getPageRepository().getAllPages()) {
-            ToughWikiAPI.getInstance().getViewManager().store(new IFWikiPageView(page.getName()));
+            IFWikiPageView view = new IFWikiPageView(page.getName(), page.getInfo().getModifiers());
+            ToughWikiAPI.getInstance().getViewManager().store(view);
         }
     }
 }

@@ -7,7 +7,6 @@ import me.theseems.toughwiki.paper.item.ItemTransformer;
 import me.theseems.toughwiki.paper.item.initializer.BukkitMaterialInitializer;
 import me.theseems.toughwiki.utils.TextUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;

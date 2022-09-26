@@ -1,8 +1,7 @@
-package me.theseems.toughwiki.impl.bootstrap.tasks.itemfactory;
+package me.theseems.toughwiki.paper.item;
 
 import me.theseems.toughwiki.impl.bootstrap.BootstrapTask;
 import me.theseems.toughwiki.impl.bootstrap.Phase;
-import me.theseems.toughwiki.paper.item.ItemFactory;
 import me.theseems.toughwiki.paper.item.initializer.BukkitMaterialInitializer;
 import me.theseems.toughwiki.paper.item.initializer.MythicMobsItemInitializer;
 import me.theseems.toughwiki.paper.item.transformer.BukkitMetaFillTransformer;
