@@ -35,6 +35,7 @@ public class IFWikiPageView implements WikiPageView {
     private final String wikiPageName;
     private final Map<UUID, PlayerGUIContext> playerGUIMap;
     private final ObjectNode defaultContext;
+
     public IFWikiPageView(String wikiPageName, ObjectNode defaultContext) {
         this.wikiPageName = wikiPageName;
         this.playerGUIMap = new ConcurrentHashMap<>();
@@ -65,7 +66,8 @@ public class IFWikiPageView implements WikiPageView {
         }
 
         PlayerGUIContext context = playerGUIMap.computeIfAbsent(player, uuid -> makeContext(onlinePlayer, null));
-        if (Duration.between(context.lastUpdate, ZonedDateTime.now()).compareTo(PER_PLAYER_CACHE_TTL) > 0) {
+        if (isInvalidationAvailable()
+                && Duration.between(context.lastUpdate, ZonedDateTime.now()).compareTo(PER_PLAYER_CACHE_TTL) > 0) {
             dispose(player);
             context = makeContext(onlinePlayer, context);
         }
@@ -206,6 +208,12 @@ public class IFWikiPageView implements WikiPageView {
         return Optional.ofNullable(defaultContext.get("maxLines"))
                 .filter(JsonNode::isInt)
                 .map(JsonNode::asInt).orElse(6);
+    }
+
+    public boolean isInvalidationAvailable() {
+        return Optional.ofNullable(defaultContext.get("invalidation"))
+                .filter(JsonNode::isBoolean)
+                .map(JsonNode::asBoolean).orElse(false);
     }
 
     public List<Component> getSeeMore() {
