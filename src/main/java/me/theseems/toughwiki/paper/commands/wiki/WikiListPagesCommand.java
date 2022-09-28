@@ -33,7 +33,7 @@ public class WikiListPagesCommand implements SubCommand {
             sender.sendMessage(TextUtils.parse("&f" + allPage.getName() + " ")
                     .append(TextUtils.parse("&b&l[OPEN]").clickEvent(ClickEvent.clickEvent(
                             ClickEvent.Action.RUN_COMMAND,
-                            "/wiki page " + allPage.getName()))));
+                            "/toughwiki page " + allPage.getName()))));
         }
     }
 }
