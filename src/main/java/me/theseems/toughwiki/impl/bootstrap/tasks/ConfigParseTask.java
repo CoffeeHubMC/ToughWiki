@@ -38,9 +38,6 @@ public class ConfigParseTask extends BootstrapTask {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         ToughWikiConfig wikiConfig = mapper.readValue(configFile, ToughWikiConfig.class);
 
-        System.out.println("WIKI CONFIG " + wikiConfig);
-        wikiConfig.getPages().forEach((s, config) -> System.out.println("Name '" + s + "' has a context of " + config.getContent().getModifiers()));
-
         File pagesFolder = new File(configFile.getParentFile(), "pages");
         if (!pagesFolder.exists()) {
             pagesFolder.mkdir();

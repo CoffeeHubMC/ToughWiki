@@ -33,7 +33,7 @@ public class GotoActionHandler extends IFWikiPageActionHandler {
                 .show(humanEntity.getUniqueId());
     }
 
-    private String getGoto(WikiPageItemConfig config) {
+    public static String getGoto(WikiPageItemConfig config) {
         if (config.getModifiers() != null && config.getModifiers().containsKey("goto")) {
             JsonNode action = config.getModifiers().get("goto");
             if (!action.isTextual()) {

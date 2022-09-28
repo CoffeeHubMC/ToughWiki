@@ -3,6 +3,7 @@ package me.theseems.toughwiki.paper.view.action;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
+import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import me.theseems.toughwiki.api.WikiPageItemConfig;
 import me.theseems.toughwiki.api.view.ActionSender;
 import me.theseems.toughwiki.paper.view.IFWikiPageView;
@@ -62,6 +63,16 @@ public class IFWikiActionSender implements ActionSender {
                 .filter(item -> item.equals(guiItem))
                 .forEach(guiItem -> guiItem.getItem().setItemMeta(meta));
         chestGui.update();
+    }
+
+    public void replaceGUIItem(int slot, GuiItem target) {
+        getPane().removeItem(slot % 9, slot / 9);
+        getPane().addItem(target, slot % 9, slot / 9);
+        chestGui.update();
+    }
+
+    public StaticPane getPane() {
+        return (StaticPane) chestGui.getPanes().iterator().next();
     }
 
     public InventoryClickEvent getEvent() {

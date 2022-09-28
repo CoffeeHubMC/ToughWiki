@@ -15,6 +15,9 @@ import me.theseems.toughwiki.api.WikiPageItemConfig;
 import me.theseems.toughwiki.api.view.Action;
 import me.theseems.toughwiki.api.view.WikiPageView;
 import me.theseems.toughwiki.paper.view.action.IFWikiActionSender;
+import me.theseems.toughwiki.paper.view.action.handlers.CommandActionHandler;
+import me.theseems.toughwiki.paper.view.action.handlers.GotoActionHandler;
+import me.theseems.toughwiki.paper.view.action.handlers.SwitchActionHandler;
 import me.theseems.toughwiki.utils.TextUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -40,7 +43,6 @@ public class IFWikiPageView implements WikiPageView {
         this.wikiPageName = wikiPageName;
         this.playerGUIMap = new ConcurrentHashMap<>();
         this.defaultContext = defaultContext == null ? new ObjectNode(new ObjectMapper().getNodeFactory()) : defaultContext;
-        ToughWiki.getPluginLogger().info("Oi bruv i fancy printing my brilliant global context: " + this.defaultContext);
     }
 
     @Override
@@ -131,59 +133,17 @@ public class IFWikiPageView implements WikiPageView {
         ChestGui chestGui = new ChestGui(size, textHolder);
 
         StaticPane pane = new StaticPane(0, 0, 9, size);
-        int maxLines = getMaxLines();
 
         for (WikiPageItemConfig content : wikiPage.getInfo().getItems()) {
-            ItemStack stack = ToughWiki.getItemFactory().produce(player, content);
             int slot = getSlot(content);
-
-            Action currentAction = getAction(content);
-            if (getGoto(content) != null) {
-                currentAction = Action.GOTO;
-            }
-            if (getCommand(content) != null) {
-                currentAction = Action.COMMAND;
+            if (slot == -1) {
+                continue;
             }
 
-            Action finalCurrentAction = currentAction;
-            if (slot != -1) {
-                int currentLinesOffset = Optional.ofNullable(context.get("scroll-offset-item-" + slot))
-                        .filter(JsonNode::isInt)
-                        .map(JsonNode::asInt)
-                        .orElse(0);
-
-                ItemMeta meta = stack.getItemMeta();
-                if (meta.lore() != null && meta.lore().size() > maxLines) {
-                    Stream<Component> componentStream = Objects.requireNonNull(meta.lore()).stream()
-                            .skip(currentLinesOffset)
-                            .limit(maxLines);
-                    if (currentAction == Action.SCROLL_ITEM && getSeeMore() != null) {
-                        componentStream = Stream.concat(componentStream, getSeeMore().stream());
-                    }
-                    meta.lore(componentStream.collect(Collectors.toList()));
-                }
-
-                stack.setItemMeta(meta);
-            }
-
-            GuiItem guiItem = new GuiItem(stack);
-            guiItem.setAction(inventoryClickEvent -> {
-                try {
-                    ToughWikiAPI.getInstance().getActionEmitter().emit(
-                            finalCurrentAction,
-                            new IFWikiActionSender(this,
-                                    content,
-                                    chestGui,
-                                    guiItem,
-                                    getSlot(content),
-                                    inventoryClickEvent));
-                } finally {
-                    inventoryClickEvent.setCancelled(true);
-                }
-            });
+            GuiItem item = makeItem(player, chestGui, content, context);
 
             pane.removeItem(slot % 9, slot / 9);
-            pane.addItem(guiItem, slot % 9, slot / 9);
+            pane.addItem(item, slot % 9, slot / 9);
         }
 
         chestGui.addPane(pane);
@@ -192,6 +152,68 @@ public class IFWikiPageView implements WikiPageView {
         chestGui.update();
 
         return chestGui;
+    }
+
+    public GuiItem makeItem(Player player, ChestGui chestGui, WikiPageItemConfig content, ObjectNode context) {
+        ItemStack stack = ToughWiki.getItemFactory().produce(player, content);
+        int slot = getSlot(content);
+        if (context == null) {
+            context = playerGUIMap.get(player.getUniqueId()).context;
+        }
+
+        Action currentAction = getAction(content);
+        if (GotoActionHandler.getGoto(content) != null) {
+            currentAction = Action.GOTO;
+        }
+        if (CommandActionHandler.getCommand(content) != null) {
+            currentAction = Action.COMMAND;
+        }
+        if (SwitchActionHandler.getSwitchTo(content) != null) {
+            currentAction = Action.SWITCH_ITEM;
+        }
+
+        Action finalCurrentAction = currentAction;
+        if (slot != -1) {
+            int currentLinesOffset = Optional.ofNullable(context.get("scroll-offset-item-" + slot))
+                    .filter(JsonNode::isInt)
+                    .map(JsonNode::asInt)
+                    .orElse(0);
+
+            ItemMeta meta = stack.getItemMeta();
+            if (meta.lore() != null && meta.lore().size() > getMaxLines()) {
+                Stream<Component> componentStream = Objects.requireNonNull(meta.lore()).stream()
+                        .skip(currentLinesOffset)
+                        .limit(getMaxLines());
+                if (currentAction == Action.SCROLL_ITEM && getSeeMore() != null) {
+                    componentStream = Stream.concat(componentStream, getSeeMore().stream());
+                }
+                meta.lore(componentStream.collect(Collectors.toList()));
+            }
+
+            stack.setItemMeta(meta);
+        }
+
+        GuiItem guiItem = new GuiItem(stack);
+        guiItem.setAction(inventoryClickEvent -> {
+            try {
+                ToughWikiAPI.getInstance().getActionEmitter().emit(
+                        finalCurrentAction,
+                        new IFWikiActionSender(this,
+                                content,
+                                chestGui,
+                                guiItem,
+                                getSlot(content),
+                                inventoryClickEvent));
+            } finally {
+                inventoryClickEvent.setCancelled(true);
+            }
+        });
+
+        return guiItem;
+    }
+
+    public GuiItem makeItem(Player player, ChestGui chestGui, WikiPageItemConfig content) {
+        return makeItem(player, chestGui, content, null);
     }
 
     private int getSlot(WikiPageItemConfig config) {
@@ -204,10 +226,24 @@ public class IFWikiPageView implements WikiPageView {
         return -1;
     }
 
+    public WikiPageItemConfig getRef(String reference) {
+        for (WikiPageItemConfig item : getPage().getInfo().getItems()) {
+            Map<String, JsonNode> modifiers = item.getModifiers();
+            if (modifiers.containsKey("ref")
+                    && modifiers.get("ref").isTextual()
+                    && modifiers.get("ref").asText().equals(reference)) {
+                return item;
+            }
+        }
+
+        return null;
+    }
+
     public int getMaxLines() {
         return Optional.ofNullable(defaultContext.get("maxLines"))
                 .filter(JsonNode::isInt)
-                .map(JsonNode::asInt).orElse(6);
+                .map(JsonNode::asInt)
+                .orElse(999);
     }
 
     public boolean isInvalidationAvailable() {
@@ -250,34 +286,6 @@ public class IFWikiPageView implements WikiPageView {
                     ToughWiki.getPluginLogger()
                             .warning("Invalid action specified for config " + config + ": '" + action + "'");
                 }
-            }
-        }
-
-        return null;
-    }
-
-    private String getGoto(WikiPageItemConfig config) {
-        if (config.getModifiers() != null && config.getModifiers().containsKey("goto")) {
-            JsonNode action = config.getModifiers().get("goto");
-            if (!action.isTextual()) {
-                ToughWiki.getPluginLogger()
-                        .warning("Could not find a target for goto: " + config + " (" + action + ")");
-            } else {
-                return action.asText();
-            }
-        }
-
-        return null;
-    }
-
-    private String getCommand(WikiPageItemConfig config) {
-        if (config.getModifiers() != null && config.getModifiers().containsKey("command")) {
-            JsonNode action = config.getModifiers().get("command");
-            if (!action.isTextual()) {
-                ToughWiki.getPluginLogger()
-                        .warning("Could not parse a command: " + config + " (" + action + ")");
-            } else {
-                return action.asText();
             }
         }
 

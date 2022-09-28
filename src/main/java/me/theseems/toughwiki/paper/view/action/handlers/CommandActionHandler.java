@@ -28,7 +28,7 @@ public class CommandActionHandler extends IFWikiPageActionHandler {
         }
     }
 
-    private String getCommand(WikiPageItemConfig config) {
+    public static String getCommand(WikiPageItemConfig config) {
         if (config.getModifiers() != null && config.getModifiers().containsKey("command")) {
             JsonNode action = config.getModifiers().get("command");
             if (!action.isTextual()) {
