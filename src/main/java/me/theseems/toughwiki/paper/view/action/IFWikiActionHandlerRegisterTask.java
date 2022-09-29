@@ -21,7 +21,8 @@ public class IFWikiActionHandlerRegisterTask extends BootstrapTask {
                         new CommandActionHandler(),
                         new GotoActionHandler(),
                         new ScrollActionHandler(),
-                        new SwitchActionHandler())
+                        new SwitchActionHandler(),
+                        new SoundHandler())
                 .forEach(ToughWikiAPI.getInstance().getActionEmitter()::register);
     }
 }
