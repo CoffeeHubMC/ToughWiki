@@ -52,16 +52,19 @@ public class ConfigParseTask extends BootstrapTask {
                         try {
                             flatToughWikiConfig = mapper.readValue(file, FlatToughWikiConfig.class);
                         } catch (IOException e) {
-                            throw new RuntimeException(e);
+                            logger.warning("Failed to load config @ " + path + ":");
+                            e.printStackTrace();
+                            return;
                         }
                         flatToughWikiConfig.getPages().forEach((name, config) -> {
                             if (wikiConfig.getPages().containsKey(name)) {
-                                throw new IllegalStateException(
-                                        "File " + file + " contains a page that is present at least twice");
+                                logger.warning("File %s contains a page that is present at least twice: '%s'"
+                                        .formatted(file, name));
+                                return;
                             }
 
                             wikiConfig.getPages().put(name, config);
-                            logger.info("Included %s (%s)".formatted(name, path));
+                            logger.info("Loaded page %s from %s".formatted(name, path));
                         });
                     });
         }
