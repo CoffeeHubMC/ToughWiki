@@ -1,4 +1,4 @@
-package me.theseems.toughwiki.paper.commands.wiki;
+package me.theseems.toughwiki.paper.commands.toughwiki;
 
 import me.theseems.toughwiki.api.ToughWikiAPI;
 import me.theseems.toughwiki.api.view.WikiPageView;
@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Optional;
 
-public class WikiShowPageCommand implements SubCommand {
+public class WikiShowPageSubCommand implements SubCommand {
     @Override
     public String getLabel() {
         return "page";

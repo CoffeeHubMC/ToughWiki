@@ -66,7 +66,6 @@ public class IFWikiActionSender implements ActionSender {
     }
 
     public void replaceGUIItem(int slot, GuiItem target) {
-        getPane().removeItem(slot % 9, slot / 9);
         getPane().addItem(target, slot % 9, slot / 9);
         chestGui.update();
     }

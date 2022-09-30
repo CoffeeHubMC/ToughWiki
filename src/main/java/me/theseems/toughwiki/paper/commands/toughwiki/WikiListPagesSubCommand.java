@@ -1,4 +1,4 @@
-package me.theseems.toughwiki.paper.commands.wiki;
+package me.theseems.toughwiki.paper.commands.toughwiki;
 
 import me.theseems.toughwiki.api.ToughWikiAPI;
 import me.theseems.toughwiki.api.WikiPage;
@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Collection;
 
-public class WikiListPagesCommand implements SubCommand {
+public class WikiListPagesSubCommand implements SubCommand {
     @Override
     public String getLabel() {
         return "list";

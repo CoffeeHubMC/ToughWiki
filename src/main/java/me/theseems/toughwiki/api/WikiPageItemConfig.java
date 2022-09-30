@@ -9,11 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class WikiPageItemConfig {
+public class WikiPageItemConfig implements Cloneable {
     private String type;
     private String title;
     private List<String> lore;
-
     @JsonUnwrapped
     private Map<String, JsonNode> modifiers;
 
@@ -50,5 +49,20 @@ public class WikiPageItemConfig {
                 ", lore=" + lore +
                 ", modifiers=" + modifiers +
                 '}';
+    }
+
+    @Override
+    public WikiPageItemConfig clone() {
+        try {
+            WikiPageItemConfig clone = (WikiPageItemConfig) super.clone();
+            clone.modifiers = new HashMap<>();
+            clone.modifiers.putAll(modifiers);
+            clone.type = type;
+            clone.lore = lore;
+            clone.title = title;
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

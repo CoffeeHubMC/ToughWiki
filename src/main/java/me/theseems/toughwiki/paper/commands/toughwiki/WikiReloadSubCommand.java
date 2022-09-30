@@ -1,4 +1,4 @@
-package me.theseems.toughwiki.paper.commands.wiki;
+package me.theseems.toughwiki.paper.commands.toughwiki;
 
 import me.theseems.toughwiki.ToughWiki;
 import me.theseems.toughwiki.impl.bootstrap.Phase;
@@ -6,7 +6,7 @@ import me.theseems.toughwiki.paper.commands.SubCommand;
 import me.theseems.toughwiki.utils.TextUtils;
 import org.bukkit.command.CommandSender;
 
-public class WikiReloadCommand implements SubCommand {
+public class WikiReloadSubCommand implements SubCommand {
     @Override
     public String getLabel() {
         return "reload";

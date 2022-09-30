@@ -3,6 +3,7 @@ package me.theseems.toughwiki.paper.view;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.stefvanschie.inventoryframework.adventuresupport.ComponentHolder;
 import com.github.stefvanschie.inventoryframework.adventuresupport.TextHolder;
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
@@ -67,7 +68,9 @@ public class IFWikiPageView implements WikiPageView {
             return;
         }
 
-        PlayerGUIContext context = playerGUIMap.computeIfAbsent(player, uuid -> makeContext(onlinePlayer, null));
+        PlayerGUIContext context = playerGUIMap
+                .computeIfAbsent(player, uuid -> makeContext(onlinePlayer, null));
+
         if (isInvalidationAvailable()
                 && Duration.between(context.lastUpdate, ZonedDateTime.now()).compareTo(PER_PLAYER_CACHE_TTL) > 0) {
             dispose(player);
@@ -118,7 +121,7 @@ public class IFWikiPageView implements WikiPageView {
         if (previous != null) {
             newContext.context = previous.context;
         } else {
-            newContext.context = new ObjectNode(new ObjectMapper().getNodeFactory());
+            newContext.context = new ObjectNode(new ObjectMapper(new YAMLFactory()).getNodeFactory());
         }
         newContext.chestGui = makeChestGUI(player, newContext.context);
         return newContext;
@@ -135,15 +138,12 @@ public class IFWikiPageView implements WikiPageView {
         StaticPane pane = new StaticPane(0, 0, 9, size);
 
         for (WikiPageItemConfig content : wikiPage.getInfo().getItems()) {
-            int slot = getSlot(content);
-            if (slot == -1) {
-                continue;
+            for (Integer slot : getSlots(content)) {
+                GuiItem item = makeItem(player, chestGui, content, context, slot);
+
+                pane.removeItem(slot % 9, slot / 9);
+                pane.addItem(item, slot % 9, slot / 9);
             }
-
-            GuiItem item = makeItem(player, chestGui, content, context);
-
-            pane.removeItem(slot % 9, slot / 9);
-            pane.addItem(item, slot % 9, slot / 9);
         }
 
         chestGui.addPane(pane);
@@ -154,9 +154,16 @@ public class IFWikiPageView implements WikiPageView {
         return chestGui;
     }
 
-    public GuiItem makeItem(Player player, ChestGui chestGui, WikiPageItemConfig content, ObjectNode context) {
+    public GuiItem makeItem(Player player,
+                            ChestGui chestGui,
+                            WikiPageItemConfig content,
+                            ObjectNode context,
+                            Integer slot) {
+        if (slot == null) {
+            slot = -1;
+        }
+
         ItemStack stack = ToughWiki.getItemFactory().produce(player, content);
-        int slot = getSlot(content);
         if (context == null) {
             context = playerGUIMap.get(player.getUniqueId()).context;
         }
@@ -194,6 +201,7 @@ public class IFWikiPageView implements WikiPageView {
         }
 
         GuiItem guiItem = new GuiItem(stack);
+        int finalSlot = slot;
         guiItem.setAction(inventoryClickEvent -> {
             try {
                 ToughWikiAPI.getInstance().getActionEmitter().emit(
@@ -202,7 +210,7 @@ public class IFWikiPageView implements WikiPageView {
                                 content,
                                 chestGui,
                                 guiItem,
-                                getSlot(content),
+                                finalSlot,
                                 inventoryClickEvent));
             } finally {
                 inventoryClickEvent.setCancelled(true);
@@ -212,18 +220,27 @@ public class IFWikiPageView implements WikiPageView {
         return guiItem;
     }
 
-    public GuiItem makeItem(Player player, ChestGui chestGui, WikiPageItemConfig content) {
-        return makeItem(player, chestGui, content, null);
+    public GuiItem makeItem(Player player, ChestGui chestGui, WikiPageItemConfig content, Integer slot) {
+        return makeItem(player, chestGui, content, null, slot);
     }
 
-    private int getSlot(WikiPageItemConfig config) {
+    private List<Integer> getSlots(WikiPageItemConfig config) {
         if (config.getModifiers() != null && config.getModifiers().containsKey("slot")) {
             JsonNode slot = config.getModifiers().get("slot");
             if (slot.isNumber()) {
-                return slot.intValue();
+                return Collections.singletonList(slot.asInt());
+            } else if (slot.isArray()) {
+                List<Integer> slots = new LinkedList<>();
+                slot.elements().forEachRemaining(jsonNode -> {
+                    if (jsonNode.isNumber()) {
+                        slots.add(jsonNode.asInt());
+                    }
+                });
+
+                return slots;
             }
         }
-        return -1;
+        return Collections.emptyList();
     }
 
     public WikiPageItemConfig getRef(String reference) {
@@ -292,6 +309,10 @@ public class IFWikiPageView implements WikiPageView {
         return null;
     }
 
+    public Map<UUID, PlayerGUIContext> getPlayerGUIMap() {
+        return playerGUIMap;
+    }
+
     private static class PlayerGUIContext {
         private ZonedDateTime lastUpdate;
         private ChestGui chestGui;
@@ -302,6 +323,7 @@ public class IFWikiPageView implements WikiPageView {
             return "PlayerGUIContext{" +
                     "lastUpdate=" + lastUpdate +
                     ", chestGui=" + chestGui +
+                    ", context=" + context +
                     '}';
         }
     }

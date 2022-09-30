@@ -21,11 +21,11 @@ public class CommandContainer implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 0
                 || args[0].equalsIgnoreCase("help")
                 || !subCommandMap.containsKey(args[0].toLowerCase())) {
-            showHelp(command, sender);
+            showHelp(label, sender);
             return true;
         }
 
@@ -40,13 +40,13 @@ public class CommandContainer implements CommandExecutor {
         return true;
     }
 
-    protected void showHelp(Command command, CommandSender sender) {
+    protected void showHelp(String commandLabel, CommandSender sender) {
         showBanner(sender);
         for (SubCommand value : subCommandMap.values()) {
             if (sender.hasPermission(value.getPermission())) {
                 sender.sendMessage(TextUtils
-                        .parse("&b/" + command.getLabel() + " " + value.getLabel() + " &7- &f" + value.getDescription())
-                        .clickEvent(ClickEvent.suggestCommand("/" + command.getLabel() + " " + value.getLabel())));
+                        .parse("&b/" + commandLabel + " " + value.getLabel() + " &7- &f" + value.getDescription())
+                        .clickEvent(ClickEvent.suggestCommand("/" + commandLabel + " " + value.getLabel())));
             }
         }
     }

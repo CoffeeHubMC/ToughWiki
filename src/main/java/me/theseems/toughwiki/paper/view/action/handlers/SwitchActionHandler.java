@@ -1,6 +1,7 @@
 package me.theseems.toughwiki.paper.view.action.handlers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.IntNode;
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import me.theseems.toughwiki.ToughWiki;
 import me.theseems.toughwiki.api.WikiPageItemConfig;
@@ -27,7 +28,10 @@ public class SwitchActionHandler extends IFWikiPageActionHandler {
             throw new IllegalStateException("Could not find item by ref: '" + getSwitchTo(sender.getItemConfig()) + "'");
         }
 
-        GuiItem item = sender.getView().makeItem(player, sender.getChestGui(), ref);
+        WikiPageItemConfig clone = ref.clone();
+        clone.getModifiers().put("slot", new IntNode(sender.getSlot()));
+
+        GuiItem item = sender.getView().makeItem(player, sender.getChestGui(), clone, sender.getSlot());
         sender.replaceGUIItem(sender.getSlot(), item);
     }
 

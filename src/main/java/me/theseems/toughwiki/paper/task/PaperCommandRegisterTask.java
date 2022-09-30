@@ -3,8 +3,8 @@ package me.theseems.toughwiki.paper.task;
 import me.theseems.toughwiki.ToughWiki;
 import me.theseems.toughwiki.impl.bootstrap.BootstrapTask;
 import me.theseems.toughwiki.impl.bootstrap.Phase;
+import me.theseems.toughwiki.paper.commands.toughwiki.ToughWikiCommand;
 import me.theseems.toughwiki.paper.commands.wiki.WikiCommand;
-import me.theseems.toughwiki.paper.commands.wiki.WikiDefaultCommand;
 
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -19,7 +19,7 @@ public class PaperCommandRegisterTask extends BootstrapTask {
 
     @Override
     public void run(Logger logger) {
-        Objects.requireNonNull(toughWiki.getCommand("toughwiki")).setExecutor(new WikiCommand());
-        Objects.requireNonNull(toughWiki.getCommand("wiki")).setExecutor(new WikiDefaultCommand());
+        Objects.requireNonNull(toughWiki.getCommand("toughwiki")).setExecutor(new ToughWikiCommand());
+        Objects.requireNonNull(toughWiki.getCommand("wiki")).setExecutor(new WikiCommand());
     }
 }

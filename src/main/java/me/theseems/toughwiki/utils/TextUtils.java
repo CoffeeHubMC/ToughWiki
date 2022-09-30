@@ -31,7 +31,7 @@ public class TextUtils {
     }
 
     @NotNull
-    public static String replaceLegacy(@NotNull String text) {
+    private static String replaceLegacy(@NotNull String text) {
         text = text.replace('\u00A7', '&');
         return text.replace("&0", "<black>")
                 .replace("&1", "<dark_blue>")

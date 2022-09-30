@@ -1,4 +1,4 @@
-package me.theseems.toughwiki.paper.commands.wiki;
+package me.theseems.toughwiki.paper.commands.debug;
 
 import me.theseems.toughwiki.ToughWiki;
 import me.theseems.toughwiki.api.ToughWikiAPI;
@@ -12,20 +12,20 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Collection;
 
-public class WikiDebugCommand implements SubCommand {
+public class GeneralInfoSubCommand implements SubCommand {
     @Override
     public String getLabel() {
-        return "debug";
+        return "generalinfo";
     }
 
     @Override
     public String getDescription() {
-        return "shows debug information";
+        return "shows info about system's general configuration";
     }
 
     @Override
     public String getPermission() {
-        return "toughwiki.command.debug";
+        return "toughwiki.command.debug.generalinfo";
     }
 
     @Override
