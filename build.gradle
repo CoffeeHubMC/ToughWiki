@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'maven-publish'
     id "com.github.johnrengelman.shadow" version "7.1.2"
     id "org.jetbrains.gradle.plugin.idea-ext" version "1.0.1"
 }
@@ -17,7 +18,7 @@ ext {
 }
 
 group = 'me.theseems'
-version = ext.devBuild ? getVersionName() : "1.0"
+version = ext.devBuild ? getVersionName() : "1.0.0"
 
 repositories {
     mavenCentral()
@@ -36,6 +37,25 @@ repositories {
     maven {
         name = 'placeholderapi'
         url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
+    }
+}
+
+publishing {
+    publications {
+        plugin(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            name "nexus"
+            url project.nexusURL
+            credentials {
+                username project.coffeehubUsername
+                password project.coffeehubPassword
+            }
+        }
     }
 }
 

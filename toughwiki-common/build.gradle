@@ -5,6 +5,19 @@ plugins {
 group 'me.theseems'
 version parent.version
 
+java {
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        common(MavenPublication) {
+            artifactId = "toughwiki-common"
+            from components.java
+        }
+    }
+}
+
 repositories {
     mavenCentral()
 }
