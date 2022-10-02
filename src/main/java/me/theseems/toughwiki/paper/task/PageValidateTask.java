@@ -1,9 +1,9 @@
-package me.theseems.toughwiki.impl.bootstrap.tasks;
+package me.theseems.toughwiki.paper.task;
 
-import me.theseems.toughwiki.ToughWiki;
-import me.theseems.toughwiki.config.ToughWikiConfig;
 import me.theseems.toughwiki.impl.bootstrap.BootstrapTask;
 import me.theseems.toughwiki.impl.bootstrap.Phase;
+import me.theseems.toughwiki.ToughWiki;
+import me.theseems.toughwiki.config.ToughWikiConfig;
 
 import java.util.HashSet;
 import java.util.Map;

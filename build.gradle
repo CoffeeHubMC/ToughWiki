@@ -41,6 +41,8 @@ repositories {
 
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.19.2-R0.1-SNAPSHOT'
+    implementation project(':toughwiki-api')
+    implementation project(':toughwiki-common')
     implementation 'com.github.stefvanschie.inventoryframework:IF:0.10.7'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.4'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'

@@ -1,11 +1,11 @@
-package me.theseems.toughwiki.impl.bootstrap.tasks;
+package me.theseems.toughwiki.paper.task;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import me.theseems.toughwiki.config.FlatToughWikiConfig;
-import me.theseems.toughwiki.config.ToughWikiConfig;
 import me.theseems.toughwiki.impl.bootstrap.BootstrapTask;
 import me.theseems.toughwiki.impl.bootstrap.Phase;
+import me.theseems.toughwiki.config.FlatToughWikiConfig;
+import me.theseems.toughwiki.config.ToughWikiConfig;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;

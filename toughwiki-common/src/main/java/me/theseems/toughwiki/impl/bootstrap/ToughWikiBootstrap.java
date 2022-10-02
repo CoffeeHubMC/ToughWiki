@@ -1,7 +1,5 @@
 package me.theseems.toughwiki.impl.bootstrap;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -15,7 +13,7 @@ public class ToughWikiBootstrap {
         this.logger = Logger.getLogger(logger.getName() + ":Bootstrap");
     }
 
-    public void add(@NotNull BootstrapTask bootstrapTask) {
+    public void add(BootstrapTask bootstrapTask) {
         bootstrapTasks.add(bootstrapTask);
     }
 
@@ -29,7 +27,7 @@ public class ToughWikiBootstrap {
         }
     }
 
-    public boolean execute(@NotNull Phase phase) {
+    public boolean execute(Phase phase) {
         for (BootstrapTask bootstrapTask : bootstrapTasks) {
             if (bootstrapTask.getPhase() == phase) {
                 Logger taskLogger = Logger.getLogger(logger.getName() + "::" + bootstrapTask.getName());
@@ -48,7 +46,7 @@ public class ToughWikiBootstrap {
         return true;
     }
 
-    public boolean execute(@NotNull Phase... phases) {
+    public boolean execute(Phase... phases) {
         for (Phase phase : phases) {
             if (!execute(phase)) {
                 return false;

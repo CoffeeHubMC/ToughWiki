@@ -1,1 +1,5 @@
 rootProject.name = 'toughwiki'
+include 'toughwiki-api'
+include 'toughwiki-common'
+include 'toughwiki-paper'
+

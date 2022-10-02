@@ -1,8 +1,8 @@
 package me.theseems.toughwiki.impl.bootstrap.tasks;
 
+import me.theseems.toughwiki.impl.bootstrap.Phase;
 import me.theseems.toughwiki.api.ToughWikiAPI;
 import me.theseems.toughwiki.impl.bootstrap.BootstrapTask;
-import me.theseems.toughwiki.impl.bootstrap.Phase;
 
 import java.util.logging.Logger;
 
