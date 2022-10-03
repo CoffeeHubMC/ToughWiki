@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CommandContainer implements CommandExecutor {
-    private final Map<String, SubCommand> subCommandMap;
+    protected final Map<String, SubCommand> subCommandMap;
 
     public CommandContainer() {
         subCommandMap = new HashMap<>();
