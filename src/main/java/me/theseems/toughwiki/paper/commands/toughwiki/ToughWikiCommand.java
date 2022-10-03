@@ -9,6 +9,7 @@ public class ToughWikiCommand extends CommandContainer {
         add(new WikiShowPageSubCommand());
         add(new WikiReloadSubCommand());
         add(new WikiListPagesSubCommand());
+        add(new WikiForceShowSubCommand());
 
         if (BuildConstants.DEV_BUILD) {
             add(new WikiDebugSubCommandContainer());
