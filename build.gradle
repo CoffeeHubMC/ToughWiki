@@ -18,7 +18,7 @@ ext {
 }
 
 group = 'me.theseems'
-version = ext.devBuild ? getVersionName() : "1.0.0"
+version = ext.devBuild ? getVersionName() : "1.0.1"
 
 repositories {
     mavenCentral()
@@ -73,6 +73,7 @@ dependencies {
 
 def targetJavaVersion = 17
 java {
+    withSourcesJar()
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
@@ -89,6 +90,7 @@ tasks.withType(JavaCompile).configureEach {
 
 shadowJar {
     relocate 'com.github.stefvanschie.inventoryframework', 'me.theseems.toughwiki.inventoryframework'
+    relocate 'com.fasterxml.jackson', 'me.theseems.toughwiki.jackson'
 }
 
 processResources {

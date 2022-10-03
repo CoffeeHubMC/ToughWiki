@@ -5,6 +5,7 @@ import me.theseems.toughwiki.impl.bootstrap.Phase;
 import me.theseems.toughwiki.impl.bootstrap.ToughWikiBootstrap;
 import me.theseems.toughwiki.impl.bootstrap.tasks.ApiInitializationTask;
 import me.theseems.toughwiki.impl.bootstrap.tasks.PageClearTask;
+import me.theseems.toughwiki.impl.bootstrap.tasks.PageViewDisposeTask;
 import me.theseems.toughwiki.paper.item.ItemFactory;
 import me.theseems.toughwiki.paper.item.ItemFactoryInitializationTask;
 import me.theseems.toughwiki.paper.task.*;
@@ -62,6 +63,7 @@ public final class ToughWiki extends JavaPlugin {
         bootstrap.add(new PaperListenerRegisterTask(plugin));
 
         bootstrap.add(new PaperListenerUnregisterTask());
+        bootstrap.add(new PageViewDisposeTask());
         bootstrap.add(new PageClearTask());
 
         bootstrap.execute(Phase.PRE_CONFIG);

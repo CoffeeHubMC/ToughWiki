@@ -16,6 +16,16 @@ public class WikiPageItemConfig implements Cloneable {
     @JsonUnwrapped
     private Map<String, JsonNode> modifiers;
 
+    public WikiPageItemConfig() {
+    }
+
+    public WikiPageItemConfig(String type, String title, List<String> lore, Map<String, JsonNode> modifiers) {
+        this.type = type;
+        this.title = title;
+        this.lore = lore;
+        this.modifiers = modifiers;
+    }
+
     public String getType() {
         return type;
     }
