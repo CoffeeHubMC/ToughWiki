@@ -26,6 +26,19 @@ pipeline {
                 archiveArtifacts artifacts: '**/build/libs/*.jar', fingerprint: true
             }
         }
+        stage('Publish') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                    credentialsId: 'coffeehubNexusAuth',
+                    usernameVariable: 'ORG_GRADLE_PROJECT_coffeehubUsername',
+                    passwordVariable: 'ORG_GRADLE_PROJECT_coffeehubPassword'),
+                    string(credentialsId: 'coffeehubNexusURL', variable: 'ORG_GRADLE_PROJECT_nexusURL')
+                ]) {
+                    sh script: 'chmod +x gradlew && ./gradlew clean build shadowJar publish', label: 'Publish to nexus'
+                }
+            }
+        }
     }
 
     post {
