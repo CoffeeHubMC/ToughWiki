@@ -20,13 +20,7 @@ pipeline {
                 }
             }
         }
-        stage('Build') {
-            steps {
-                sh script: 'chmod +x gradlew && ./gradlew build', label: 'Build project and make jar'
-                archiveArtifacts artifacts: '**/build/libs/*.jar', fingerprint: true
-            }
-        }
-        stage('Publish') {
+        stage('Build and publish') {
             steps {
                 withCredentials([
                     usernamePassword(
@@ -36,6 +30,7 @@ pipeline {
                     string(credentialsId: 'coffeehubNexusURL', variable: 'ORG_GRADLE_PROJECT_nexusURL')
                 ]) {
                     sh script: 'chmod +x gradlew && ./gradlew clean build shadowJar publish', label: 'Publish to nexus'
+                    archiveArtifacts artifacts: '**/build/libs/*.jar', fingerprint: true
                 }
             }
         }
