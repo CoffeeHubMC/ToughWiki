@@ -2,16 +2,17 @@ package me.theseems.toughwiki.paper.task;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import me.theseems.toughwiki.impl.bootstrap.BootstrapTask;
-import me.theseems.toughwiki.impl.bootstrap.Phase;
 import me.theseems.toughwiki.config.FlatToughWikiConfig;
 import me.theseems.toughwiki.config.ToughWikiConfig;
+import me.theseems.toughwiki.impl.bootstrap.BootstrapTask;
+import me.theseems.toughwiki.impl.bootstrap.Phase;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -43,6 +44,7 @@ public class ConfigParseTask extends BootstrapTask {
             pagesFolder.mkdir();
         }
 
+        AtomicLong totalForeignPageCount = new AtomicLong();
         try (Stream<Path> stream = Files.walk(pagesFolder.toPath())) {
             stream.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(".yml"))
@@ -64,9 +66,13 @@ public class ConfigParseTask extends BootstrapTask {
                             }
 
                             wikiConfig.getPages().put(name, config);
-                            logger.info("Loaded page %s from %s".formatted(name, path));
+                            totalForeignPageCount.getAndIncrement();
                         });
                     });
+        }
+
+        if (totalForeignPageCount.get() != 0) {
+            logger.info("Loaded " + totalForeignPageCount.get() + " page(s) from external files");
         }
 
         consumer.accept(wikiConfig);

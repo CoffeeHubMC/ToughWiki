@@ -1,11 +1,13 @@
 package me.theseems.toughwiki.paper.commands.toughwiki;
 
+import me.theseems.toughwiki.ToughWiki;
 import me.theseems.toughwiki.api.ToughWikiAPI;
 import me.theseems.toughwiki.api.view.WikiPageView;
 import me.theseems.toughwiki.paper.commands.SubCommand;
 import me.theseems.toughwiki.utils.TextUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -39,7 +41,12 @@ public class WikiForceShowSubCommand implements SubCommand {
                 .flatMap(page -> ToughWikiAPI.getInstance().getViewManager().getView(page));
 
         if (wikiPageView.isEmpty()) {
-            sender.sendMessage(TextUtils.parse("There is no page/view: '" + args[0] + "'"));
+            if (sender instanceof ConsoleCommandSender) {
+                ToughWiki.getPluginLogger()
+                        .warning("Console attempted to open a page '%s' which does not exist".formatted(args[0]));
+            } else {
+                sender.sendMessage(TextUtils.parse("There is no page/view: '" + args[0] + "'"));
+            }
             return;
         }
 
@@ -50,6 +57,8 @@ public class WikiForceShowSubCommand implements SubCommand {
         }
 
         wikiPageView.get().show(player.getUniqueId());
-        sender.sendMessage(TextUtils.parse("&7Successfully shown " + args[0] + " to " + args[1]));
+        if (!(sender instanceof ConsoleCommandSender)) {
+            sender.sendMessage(TextUtils.parse("&7Successfully shown " + args[0] + " to " + args[1]));
+        }
     }
 }
