@@ -17,7 +17,10 @@ import me.theseems.toughwiki.api.view.Action;
 import me.theseems.toughwiki.api.view.TriggerType;
 import me.theseems.toughwiki.api.view.WikiPageView;
 import me.theseems.toughwiki.paper.view.action.IFWikiActionSender;
+import me.theseems.toughwiki.paper.view.action.variety.SoundAction;
 import me.theseems.toughwiki.utils.TextUtils;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
@@ -211,8 +214,17 @@ public class IFWikiPageView implements WikiPageView {
                     return;
                 }
 
+                Action action = actionMap.get(type);
+                if (!(action instanceof SoundAction)) {
+                    inventoryClickEvent.getWhoClicked().playSound(
+                            Sound.sound(
+                                    Key.key("minecraft:ui.button.click"),
+                                    Sound.Source.AMBIENT,
+                                    1f, 1f));
+                }
+
                 ToughWikiAPI.getInstance().getActionEmitter().emit(
-                        actionMap.get(type),
+                        action,
                         new IFWikiActionSender(this,
                                 content,
                                 chestGui,
