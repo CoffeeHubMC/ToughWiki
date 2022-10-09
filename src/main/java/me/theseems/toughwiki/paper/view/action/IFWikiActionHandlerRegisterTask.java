@@ -15,12 +15,10 @@ public class IFWikiActionHandlerRegisterTask extends BootstrapTask {
 
     @Override
     public void run(Logger logger) throws Exception {
-        List.of(
-                        new BackActionHandler(),
+        List.of(new BackActionHandler(),
                         new CloseActionHandler(),
                         new CommandActionHandler(),
                         new GotoActionHandler(),
-                        new ScrollActionHandler(),
                         new SwitchActionHandler(),
                         new SoundHandler())
                 .forEach(ToughWikiAPI.getInstance().getActionEmitter()::register);

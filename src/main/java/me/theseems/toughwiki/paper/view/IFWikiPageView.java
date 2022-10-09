@@ -14,25 +14,20 @@ import me.theseems.toughwiki.api.ToughWikiAPI;
 import me.theseems.toughwiki.api.WikiPage;
 import me.theseems.toughwiki.api.WikiPageItemConfig;
 import me.theseems.toughwiki.api.view.Action;
+import me.theseems.toughwiki.api.view.TriggerType;
 import me.theseems.toughwiki.api.view.WikiPageView;
 import me.theseems.toughwiki.paper.view.action.IFWikiActionSender;
-import me.theseems.toughwiki.paper.view.action.handlers.CommandActionHandler;
-import me.theseems.toughwiki.paper.view.action.handlers.GotoActionHandler;
-import me.theseems.toughwiki.paper.view.action.handlers.SwitchActionHandler;
 import me.theseems.toughwiki.utils.TextUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class IFWikiPageView implements WikiPageView {
     public static final Duration PER_PLAYER_CACHE_TTL = Duration.ofSeconds(5L);
@@ -164,48 +159,60 @@ public class IFWikiPageView implements WikiPageView {
         }
 
         ItemStack stack = ToughWiki.getItemFactory().produce(player, content);
-        if (context == null) {
-            context = playerGUIMap.get(player.getUniqueId()).context;
-        }
 
-        Action currentAction = getAction(content);
-        if (GotoActionHandler.getGoto(content) != null) {
-            currentAction = Action.GOTO;
-        }
-        if (CommandActionHandler.getCommand(content) != null) {
-            currentAction = Action.COMMAND;
-        }
-        if (SwitchActionHandler.getSwitchTo(content) != null) {
-            currentAction = Action.SWITCH_ITEM;
-        }
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        Map<TriggerType, Action> actionMap = new HashMap<>();
 
-        Action finalCurrentAction = currentAction;
-        if (slot != -1) {
-            int currentLinesOffset = Optional.ofNullable(context.get("scroll-offset-item-" + slot))
-                    .filter(JsonNode::isInt)
-                    .map(JsonNode::asInt)
-                    .orElse(0);
+        if (content.getModifiers().containsKey("leftClickAction")) {
+            TriggerType type = TriggerType.LEFT_MOUSE_BUTTON;
+            Action action = ToughWiki.getActionFactory()
+                    .produce(type, (ObjectNode) content.getModifiers().get("leftClickAction"));
 
-            ItemMeta meta = stack.getItemMeta();
-            if (meta.lore() != null && meta.lore().size() > getMaxLines()) {
-                Stream<Component> componentStream = Objects.requireNonNull(meta.lore()).stream()
-                        .skip(currentLinesOffset)
-                        .limit(getMaxLines());
-                if (currentAction == Action.SCROLL_ITEM && getSeeMore() != null) {
-                    componentStream = Stream.concat(componentStream, getSeeMore().stream());
-                }
-                meta.lore(componentStream.collect(Collectors.toList()));
+            if (action != null) {
+                actionMap.put(type, action);
             }
+        }
+        if (content.getModifiers().containsKey("rightClickAction")) {
+            TriggerType type = TriggerType.RIGHT_MOUSE_BUTTON;
+            Action action = ToughWiki.getActionFactory()
+                    .produce(type, (ObjectNode) content.getModifiers().get("rightClickAction"));
 
-            stack.setItemMeta(meta);
+            if (action != null) {
+                actionMap.put(type, action);
+            }
+        }
+        if (actionMap.isEmpty()) {
+            for (TriggerType value : TriggerType.values()) {
+                Action produced = ToughWiki.getActionFactory().produce(value, mapper.valueToTree(content));
+                if (produced == null) {
+                    continue;
+                }
+
+                actionMap.put(value, produced);
+            }
         }
 
         GuiItem guiItem = new GuiItem(stack);
         int finalSlot = slot;
         guiItem.setAction(inventoryClickEvent -> {
             try {
+                TriggerType type;
+                switch (inventoryClickEvent.getClick()) {
+                    case LEFT -> type = TriggerType.LEFT_MOUSE_BUTTON;
+                    case RIGHT -> type = TriggerType.RIGHT_MOUSE_BUTTON;
+                    default -> {
+                        inventoryClickEvent.setCancelled(true);
+                        return;
+                    }
+                }
+
+                if (!actionMap.containsKey(type)) {
+                    inventoryClickEvent.setCancelled(true);
+                    return;
+                }
+
                 ToughWikiAPI.getInstance().getActionEmitter().emit(
-                        finalCurrentAction,
+                        actionMap.get(type),
                         new IFWikiActionSender(this,
                                 content,
                                 chestGui,
@@ -288,25 +295,6 @@ public class IFWikiPageView implements WikiPageView {
         });
 
         return seeMoreList;
-    }
-
-    private Action getAction(WikiPageItemConfig config) {
-        if (config.getModifiers() != null && config.getModifiers().containsKey("action")) {
-            JsonNode action = config.getModifiers().get("action");
-            if (!action.isTextual()) {
-                ToughWiki.getPluginLogger()
-                        .warning("Could not find an action for the item config (incorrect value): " + config + " (" + action + ")");
-            } else {
-                try {
-                    return Action.valueOf(action.asText());
-                } catch (IllegalArgumentException e) {
-                    ToughWiki.getPluginLogger()
-                            .warning("Invalid action specified for config " + config + ": '" + action + "'");
-                }
-            }
-        }
-
-        return null;
     }
 
     public Map<UUID, PlayerGUIContext> getPlayerGUIMap() {
