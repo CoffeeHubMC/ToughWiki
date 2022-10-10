@@ -17,6 +17,7 @@ public class PlaceholderApiTransformer extends ItemTransformer {
     @Override
     public boolean supports(Player player, ItemInitializer initializer, ItemStack stack, WikiPageItemConfig config) {
         return Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")
+                && player != null
                 && initializer instanceof BukkitMaterialInitializer;
     }
 
