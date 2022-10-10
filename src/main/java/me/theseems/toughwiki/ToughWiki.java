@@ -10,6 +10,8 @@ import me.theseems.toughwiki.paper.item.ItemFactory;
 import me.theseems.toughwiki.paper.item.ItemFactoryInitializationTask;
 import me.theseems.toughwiki.paper.task.*;
 import me.theseems.toughwiki.paper.view.action.IFWikiActionHandlerRegisterTask;
+import me.theseems.toughwiki.paper.view.action.factory.ActionFactory;
+import me.theseems.toughwiki.paper.view.action.factory.ActionFactoryInitializationTask;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,6 +23,7 @@ public final class ToughWiki extends JavaPlugin {
     private static ItemFactory itemFactory;
     private static ToughWiki plugin;
     private static ToughWikiBootstrap bootstrap;
+    private static ActionFactory actionFactory;
 
     public static ToughWikiConfig getToughConfig() {
         return config;
@@ -32,6 +35,14 @@ public final class ToughWiki extends JavaPlugin {
 
     private void setItemFactory(ItemFactory itemFactory) {
         ToughWiki.itemFactory = itemFactory;
+    }
+
+    public static ActionFactory getActionFactory() {
+        return actionFactory;
+    }
+
+    private void setActionFactory(ActionFactory actionFactory) {
+        ToughWiki.actionFactory = actionFactory;
     }
 
     public static @NotNull Logger getPluginLogger() {
@@ -53,7 +64,10 @@ public final class ToughWiki extends JavaPlugin {
 
         bootstrap.add(new ApiInitializationTask());
         bootstrap.add(new IFWikiActionHandlerRegisterTask());
+
+        bootstrap.add(new ActionFactoryInitializationTask(this::setActionFactory));
         bootstrap.add(new ItemFactoryInitializationTask(this::setItemFactory));
+
         bootstrap.add(new ConfigParseTask(new File(getDataFolder(), "config.yml"), this::setConfig));
         bootstrap.add(new PageValidateTask());
         bootstrap.add(new PageRegisterTask());

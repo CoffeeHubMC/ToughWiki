@@ -1,44 +1,25 @@
 package me.theseems.toughwiki.paper.view.action.handlers;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import me.theseems.toughwiki.ToughWiki;
-import me.theseems.toughwiki.api.WikiPageItemConfig;
-import me.theseems.toughwiki.api.view.Action;
-import me.theseems.toughwiki.paper.view.action.IFWikiActionSender;
-import me.theseems.toughwiki.paper.view.action.IFWikiPageActionHandler;
+import me.theseems.toughwiki.paper.view.action.BaseWikiPageActionHandler;
+import me.theseems.toughwiki.paper.view.action.sender.InteractEventWikiActionSender;
+import me.theseems.toughwiki.paper.view.action.variety.CommandAction;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
 import java.util.Objects;
 
-public class CommandActionHandler extends IFWikiPageActionHandler {
-    @Override
-    public boolean supports(Action action, IFWikiActionSender sender) {
-        return action == Action.COMMAND;
+public class CommandActionHandler extends BaseWikiPageActionHandler<InteractEventWikiActionSender, CommandAction> {
+    public CommandActionHandler() {
+        super(InteractEventWikiActionSender.class, CommandAction.class);
     }
 
     @Override
-    protected void proceed(Action action, IFWikiActionSender sender) {
+    protected void handle(CommandAction action, InteractEventWikiActionSender sender) {
         HumanEntity humanEntity = sender.getEvent().getWhoClicked();
         humanEntity.closeInventory();
 
         if (humanEntity instanceof Player) {
-            ((Player) humanEntity).performCommand(
-                    Objects.requireNonNull(getCommand(sender.getItemConfig())));
+            ((Player) humanEntity).performCommand(Objects.requireNonNull(action.getCommandName()));
         }
-    }
-
-    public static String getCommand(WikiPageItemConfig config) {
-        if (config.getModifiers() != null && config.getModifiers().containsKey("command")) {
-            JsonNode action = config.getModifiers().get("command");
-            if (!action.isTextual()) {
-                ToughWiki.getPluginLogger()
-                        .warning("Could not parse a command: " + config + " (" + action + ")");
-            } else {
-                return action.asText();
-            }
-        }
-
-        return null;
     }
 }

@@ -1,17 +1,16 @@
 package me.theseems.toughwiki.paper.view.action.handlers;
 
-import me.theseems.toughwiki.api.view.Action;
-import me.theseems.toughwiki.paper.view.action.IFWikiActionSender;
-import me.theseems.toughwiki.paper.view.action.IFWikiPageActionHandler;
+import me.theseems.toughwiki.paper.view.action.BaseWikiPageActionHandler;
+import me.theseems.toughwiki.paper.view.action.sender.InteractEventWikiActionSender;
+import me.theseems.toughwiki.paper.view.action.variety.CloseAction;
 
-public class CloseActionHandler extends IFWikiPageActionHandler {
-    @Override
-    public boolean supports(Action action, IFWikiActionSender sender) {
-        return action == Action.CLOSE;
+public class CloseActionHandler extends BaseWikiPageActionHandler<InteractEventWikiActionSender, CloseAction> {
+    public CloseActionHandler() {
+        super(InteractEventWikiActionSender.class, CloseAction.class);
     }
 
     @Override
-    protected void proceed(Action action, IFWikiActionSender sender) {
+    protected void handle(CloseAction action, InteractEventWikiActionSender sender) {
         sender.getEvent().getWhoClicked().closeInventory();
     }
 }
