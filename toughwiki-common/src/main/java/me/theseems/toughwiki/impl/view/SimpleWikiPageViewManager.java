@@ -5,19 +5,19 @@ import me.theseems.toughwiki.api.view.WikiPageView;
 import me.theseems.toughwiki.api.view.WikiPageViewFactory;
 import me.theseems.toughwiki.api.view.WikiPageViewManager;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SimpleWikiPageViewManager implements WikiPageViewManager {
     public static final String VIEW_FACTORY_SEPARATOR = "::";
     private final Map<String, WikiPageView> viewMap;
     private final Map<String, WikiPageViewFactory> factoryMap;
+    private final Map<String, List<WikiPageView>> factoryRegisteredViewMap;
 
     public SimpleWikiPageViewManager() {
         viewMap = new ConcurrentHashMap<>();
         factoryMap = new ConcurrentHashMap<>();
+        factoryRegisteredViewMap = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -51,8 +51,19 @@ public class SimpleWikiPageViewManager implements WikiPageViewManager {
         if (splintered.length == 1) {
             return Optional.ofNullable(viewMap.get(wikiPage.getName()));
         } else {
-            return Optional.ofNullable(factoryMap.get(splintered[0]))
+            if (viewMap.containsKey(wikiPage.getName())) {
+                return Optional.ofNullable(viewMap.get(wikiPage.getName()));
+            }
+            Optional<WikiPageView> wikiPageView = Optional
+                    .ofNullable(factoryMap.get(splintered[0]))
                     .flatMap(factory -> factory.produce(wikiPage, splintered[1]));
+
+            wikiPageView.ifPresent(pageView -> {
+                viewMap.put(wikiPage.getName(), pageView);
+                factoryRegisteredViewMap.putIfAbsent(splintered[0], new LinkedList<>());
+                factoryRegisteredViewMap.get(splintered[0]).add(pageView);
+            });
+            return wikiPageView;
         }
     }
 
@@ -71,6 +82,16 @@ public class SimpleWikiPageViewManager implements WikiPageViewManager {
 
     @Override
     public void removeFactory(String type) {
+        for (WikiPageView view : factoryRegisteredViewMap.get(type)) {
+            viewMap.remove(view.getName());
+        }
+
+        factoryRegisteredViewMap.remove(type);
         factoryMap.remove(type);
+    }
+
+    @Override
+    public Collection<WikiPageViewFactory> getAllFactories() {
+        return factoryMap.values();
     }
 }

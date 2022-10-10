@@ -12,6 +12,8 @@ public interface WikiPageViewManager {
 
     Collection<WikiPageView> getAllViews();
 
+    Collection<WikiPageViewFactory> getAllFactories();
+
     Optional<WikiPageView> getView(WikiPage wikiPage);
 
     Optional<WikiPageViewFactory> getFactory(String type);

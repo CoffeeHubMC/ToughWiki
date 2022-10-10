@@ -19,5 +19,12 @@ public class PageViewDisposeTask extends BootstrapTask {
                 .forEach(view -> ToughWikiAPI.getInstance()
                         .getViewManager()
                         .dispose(view.getPage().getName()));
+
+        ToughWikiAPI.getInstance()
+                .getViewManager()
+                .getAllFactories()
+                .forEach(factory -> ToughWikiAPI.getInstance()
+                        .getViewManager()
+                        .removeFactory(factory.getType()));
     }
 }
