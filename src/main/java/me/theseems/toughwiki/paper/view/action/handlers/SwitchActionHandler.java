@@ -3,18 +3,18 @@ package me.theseems.toughwiki.paper.view.action.handlers;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import me.theseems.toughwiki.api.WikiPageItemConfig;
-import me.theseems.toughwiki.paper.view.action.IFWikiActionSender;
-import me.theseems.toughwiki.paper.view.action.IFWikiPageActionHandler;
+import me.theseems.toughwiki.paper.view.action.BaseWikiPageActionHandler;
+import me.theseems.toughwiki.paper.view.action.sender.IFWikiActionSender;
 import me.theseems.toughwiki.paper.view.action.variety.SwitchAction;
 import org.bukkit.entity.Player;
 
-public class SwitchActionHandler extends IFWikiPageActionHandler<SwitchAction> {
+public class SwitchActionHandler extends BaseWikiPageActionHandler<IFWikiActionSender, SwitchAction> {
     public SwitchActionHandler() {
-        super(SwitchAction.class);
+        super(IFWikiActionSender.class, SwitchAction.class);
     }
 
     @Override
-    protected void proceed(SwitchAction action, IFWikiActionSender sender) {
+    protected void handle(SwitchAction action, IFWikiActionSender sender) {
         if (!(sender.getEvent().getWhoClicked() instanceof Player)) {
             return;
         }

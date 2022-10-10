@@ -16,7 +16,7 @@ import me.theseems.toughwiki.api.WikiPageItemConfig;
 import me.theseems.toughwiki.api.view.Action;
 import me.theseems.toughwiki.api.view.TriggerType;
 import me.theseems.toughwiki.api.view.WikiPageView;
-import me.theseems.toughwiki.paper.view.action.IFWikiActionSender;
+import me.theseems.toughwiki.paper.view.action.sender.IFWikiActionSender;
 import me.theseems.toughwiki.paper.view.action.variety.SoundAction;
 import me.theseems.toughwiki.utils.TextUtils;
 import net.kyori.adventure.key.Key;

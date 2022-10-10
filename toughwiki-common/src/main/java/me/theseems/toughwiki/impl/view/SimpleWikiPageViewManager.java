@@ -82,8 +82,10 @@ public class SimpleWikiPageViewManager implements WikiPageViewManager {
 
     @Override
     public void removeFactory(String type) {
-        for (WikiPageView view : factoryRegisteredViewMap.get(type)) {
-            viewMap.remove(view.getName());
+        if (factoryRegisteredViewMap.get(type) != null) {
+            for (WikiPageView view : factoryRegisteredViewMap.get(type)) {
+                viewMap.remove(view.getName());
+            }
         }
 
         factoryRegisteredViewMap.remove(type);

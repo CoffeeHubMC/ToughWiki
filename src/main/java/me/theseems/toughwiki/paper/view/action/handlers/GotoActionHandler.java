@@ -2,19 +2,19 @@ package me.theseems.toughwiki.paper.view.action.handlers;
 
 import me.theseems.toughwiki.api.ToughWikiAPI;
 import me.theseems.toughwiki.api.WikiPage;
-import me.theseems.toughwiki.paper.view.action.IFWikiActionSender;
-import me.theseems.toughwiki.paper.view.action.IFWikiPageActionHandler;
+import me.theseems.toughwiki.paper.view.action.BaseWikiPageActionHandler;
+import me.theseems.toughwiki.paper.view.action.sender.InteractEventWikiActionSender;
 import me.theseems.toughwiki.paper.view.action.variety.GotoAction;
 import org.bukkit.entity.HumanEntity;
 
-public class GotoActionHandler extends IFWikiPageActionHandler<GotoAction> {
+public class GotoActionHandler extends BaseWikiPageActionHandler<InteractEventWikiActionSender, GotoAction> {
 
     public GotoActionHandler() {
-        super(GotoAction.class);
+        super(InteractEventWikiActionSender.class, GotoAction.class);
     }
 
     @Override
-    protected void proceed(GotoAction action, IFWikiActionSender sender) {
+    protected void handle(GotoAction action, InteractEventWikiActionSender sender) {
         HumanEntity humanEntity = sender.getEvent().getWhoClicked();
 
         String gotoName = action.getGotoName();
