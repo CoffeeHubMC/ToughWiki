@@ -21,7 +21,6 @@ import me.theseems.toughwiki.paper.view.action.variety.SoundAction;
 import me.theseems.toughwiki.utils.TextUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -275,38 +274,10 @@ public class IFWikiPageView implements WikiPageView {
         return null;
     }
 
-    public int getMaxLines() {
-        return Optional.ofNullable(defaultContext.get("maxLines"))
-                .filter(JsonNode::isInt)
-                .map(JsonNode::asInt)
-                .orElse(999);
-    }
-
     public boolean isInvalidationAvailable() {
         return Optional.ofNullable(defaultContext.get("invalidation"))
                 .filter(JsonNode::isBoolean)
                 .map(JsonNode::asBoolean).orElse(false);
-    }
-
-    public List<Component> getSeeMore() {
-        JsonNode array = Optional.ofNullable(defaultContext.get("seeMoreLines"))
-                .filter(JsonNode::isArray)
-                .orElse(null);
-
-        if (array == null) {
-            return null;
-        }
-
-        List<Component> seeMoreList = new ArrayList<>();
-        array.forEach(jsonElement -> {
-            if (!jsonElement.isTextual()) {
-                throw new IllegalStateException("seeMoreLines must contain only strings");
-            }
-
-            seeMoreList.add(TextUtils.parse(jsonElement.asText()));
-        });
-
-        return seeMoreList;
     }
 
     public Map<UUID, PlayerGUIContext> getPlayerGUIMap() {

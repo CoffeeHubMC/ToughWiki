@@ -13,4 +13,10 @@ public interface WikiPageViewManager {
     Collection<WikiPageView> getAllViews();
 
     Optional<WikiPageView> getView(WikiPage wikiPage);
+
+    Optional<WikiPageViewFactory> getFactory(String type);
+
+    void storeFactory(WikiPageViewFactory factory);
+
+    void removeFactory(String type);
 }
