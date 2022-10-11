@@ -14,7 +14,7 @@ def getVersionName = { ->
     return stdout.toString().trim()
 }
 ext {
-    devBuild = true
+    devBuild = false
 }
 
 group = 'me.theseems'
@@ -50,7 +50,7 @@ publishing {
     repositories {
         maven {
             name "nexus"
-            url project.nexusURL
+            url project.ext.devBuild ? project.devNexusURL : project.nexusURL
             credentials {
                 username project.coffeehubUsername
                 password project.coffeehubPassword
