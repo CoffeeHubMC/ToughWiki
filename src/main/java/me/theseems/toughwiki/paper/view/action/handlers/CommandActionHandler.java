@@ -1,13 +1,13 @@
 package me.theseems.toughwiki.paper.view.action.handlers;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.theseems.toughwiki.api.view.ActionSender;
 import me.theseems.toughwiki.paper.view.action.handlers.base.InventoryEventActionHandler;
 import me.theseems.toughwiki.paper.view.action.variety.CommandAction;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryInteractEvent;
-
-import java.util.Objects;
 
 public class CommandActionHandler extends InventoryEventActionHandler<CommandAction> {
     public CommandActionHandler() {
@@ -19,8 +19,15 @@ public class CommandActionHandler extends InventoryEventActionHandler<CommandAct
         HumanEntity humanEntity = event.getWhoClicked();
         humanEntity.closeInventory();
 
-        if (humanEntity instanceof Player) {
-            ((Player) humanEntity).performCommand(Objects.requireNonNull(action.getCommandName()));
+        if (!(humanEntity instanceof Player)) {
+            return;
         }
+
+        String commandName = action.getCommandName();
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholdersAPI")) {
+            commandName = PlaceholderAPI.setPlaceholders((Player) humanEntity, commandName);
+        }
+
+        ((Player) humanEntity).performCommand(commandName);
     }
 }
