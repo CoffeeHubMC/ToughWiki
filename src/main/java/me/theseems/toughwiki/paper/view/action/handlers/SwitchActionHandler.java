@@ -20,15 +20,15 @@ public class SwitchActionHandler extends BaseWikiPageActionHandler<SwitchAction>
     @Override
     protected boolean check(SwitchAction action, ActionSender sender) {
         return sender.getContainer().<InventoryInteractEvent, IFWikiPageView, Integer, ChestGui>
-                exists("event", "ifwikiview", "slot", "chestGui");
+                exists("event", "view", "slot", "chestGUI");
     }
 
     @Override
     protected void handle(SwitchAction action, ActionSender sender) {
         InventoryInteractEvent event = sender.getContainer().getValue("event");
-        IFWikiPageView view = sender.getContainer().getValue("ifwikiview");
+        IFWikiPageView view = sender.getContainer().getValue("view");
         int slot = sender.getContainer().getValue("slot");
-        ChestGui chestGui = sender.getContainer().getValue("chestGui");
+        ChestGui chestGui = sender.getContainer().getValue("chestGUI");
 
         if (!(event.getWhoClicked() instanceof Player)) {
             return;
