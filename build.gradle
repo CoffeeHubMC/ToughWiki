@@ -18,7 +18,7 @@ ext {
 }
 
 group = 'me.theseems'
-version = ext.devBuild ? getVersionName() : "1.1.0"
+version = ext.devBuild ? getVersionName() : "1.2.0"
 
 repositories {
     mavenCentral()
@@ -50,7 +50,7 @@ publishing {
     repositories {
         maven {
             name "nexus"
-            url project.nexusURL
+            url project.ext.devBuild ? project.devNexusURL : project.nexusURL
             credentials {
                 username project.coffeehubUsername
                 password project.coffeehubPassword

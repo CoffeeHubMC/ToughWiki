@@ -2,20 +2,21 @@ package me.theseems.toughwiki.paper.view.action.handlers;
 
 import me.theseems.toughwiki.api.ToughWikiAPI;
 import me.theseems.toughwiki.api.WikiPage;
-import me.theseems.toughwiki.paper.view.action.BaseWikiPageActionHandler;
-import me.theseems.toughwiki.paper.view.action.sender.InteractEventWikiActionSender;
+import me.theseems.toughwiki.api.view.ActionSender;
+import me.theseems.toughwiki.paper.view.action.handlers.base.InventoryEventActionHandler;
 import me.theseems.toughwiki.paper.view.action.variety.BackAction;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.event.inventory.InventoryInteractEvent;
 
-public class BackActionHandler extends BaseWikiPageActionHandler<InteractEventWikiActionSender, BackAction> {
+public class BackActionHandler extends InventoryEventActionHandler<BackAction> {
     public BackActionHandler() {
-        super(InteractEventWikiActionSender.class, BackAction.class);
+        super(BackAction.class);
     }
 
     @Override
-    protected void handle(BackAction action, InteractEventWikiActionSender sender) {
+    protected void handle(BackAction action, ActionSender sender, InventoryInteractEvent event) {
         WikiPage page = sender.getView().getPage();
-        HumanEntity opener = sender.getEvent().getWhoClicked();
+        HumanEntity opener = event.getWhoClicked();
 
         if (page.getParent().isPresent()) {
             try {

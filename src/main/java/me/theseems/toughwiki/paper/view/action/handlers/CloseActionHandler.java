@@ -1,16 +1,17 @@
 package me.theseems.toughwiki.paper.view.action.handlers;
 
-import me.theseems.toughwiki.paper.view.action.BaseWikiPageActionHandler;
-import me.theseems.toughwiki.paper.view.action.sender.InteractEventWikiActionSender;
+import me.theseems.toughwiki.api.view.ActionSender;
+import me.theseems.toughwiki.paper.view.action.handlers.base.InventoryEventActionHandler;
 import me.theseems.toughwiki.paper.view.action.variety.CloseAction;
+import org.bukkit.event.inventory.InventoryInteractEvent;
 
-public class CloseActionHandler extends BaseWikiPageActionHandler<InteractEventWikiActionSender, CloseAction> {
+public class CloseActionHandler extends InventoryEventActionHandler<CloseAction> {
     public CloseActionHandler() {
-        super(InteractEventWikiActionSender.class, CloseAction.class);
+        super(CloseAction.class);
     }
 
     @Override
-    protected void handle(CloseAction action, InteractEventWikiActionSender sender) {
-        sender.getEvent().getWhoClicked().closeInventory();
+    protected void handle(CloseAction action, ActionSender sender, InventoryInteractEvent event) {
+        event.getWhoClicked().closeInventory();
     }
 }
