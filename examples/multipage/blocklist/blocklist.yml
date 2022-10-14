@@ -1,0 +1,18 @@
+building:
+  title: '&e&lBUILDING Section'
+  size: 4
+  parent: default
+  items:
+    - type: 'GRASS'
+      slot: 11
+    - type: 'STONE'
+      slot: 12
+    - type: 'WHITE_WOOL'
+      slot: 13
+    - type: 'BRICKS'
+      slot: 14
+    - type: 'QUARTZ'
+      slot: 15
+    - type: 'ARROW'
+      slot: 35
+      action: BACK

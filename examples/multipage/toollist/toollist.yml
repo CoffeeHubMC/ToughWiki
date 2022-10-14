@@ -1,0 +1,23 @@
+farming:
+  title: '&a&lFARMING Section'
+  size: 4
+  parent: default
+  items:
+    - type: 'WHEAT_SEEDS'
+      slot: 10
+    - type: 'WOODEN_HOE'
+      slot: 11
+    - type: 'STONE_HOE'
+      slot: 12
+    - type: 'IRON_HOE'
+      slot: 13
+    - type: 'GOLDEN_HOE'
+      slot: 14
+    - type: 'DIAMOND_HOE'
+      slot: 15
+    - type: 'NETHERITE_HOE'
+      slot: 16
+    - type: 'ARROW'
+      title: 'hm %player_name%, back?'
+      slot: 35
+      action: BACK

@@ -1,0 +1,23 @@
+swordlist:
+  title: '&4&lSword list'
+  size: 4
+  parent: default
+  items:
+    - type: 'NETHERITE_AXE'
+      slot: 10
+    - type: 'WOODEN_SWORD'
+      slot: 11
+    - type: 'STONE_SWORD'
+      slot: 12
+    - type: 'IRON_SWORD'
+      slot: 13
+    - type: 'GOLDEN_SWORD'
+      slot: 14
+    - type: 'DIAMOND_SWORD'
+      slot: 15
+    - type: 'NETHERITE_SWORD'
+      slot: 16
+    - type: 'ARROW'
+      title: 'Let''s go back, %player_name%'
+      slot: 35
+      action: BACK

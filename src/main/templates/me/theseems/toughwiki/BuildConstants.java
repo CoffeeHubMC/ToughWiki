@@ -4,5 +4,5 @@ package me.theseems.toughwiki;
 public class BuildConstants {
 
     public static final String VERSION = "${version}";
-    public static final Boolean DEV_BUILD = Boolean.valueOf("${devBuild}");
+    public static final Boolean DEV_BUILD = ${devBuild};
 }

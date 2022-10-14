@@ -1,0 +1,39 @@
+default:
+  title: 'Main Section'
+  size: 4
+  items:
+    - type: 'DIAMOND_SWORD'
+      lore:
+        - ''
+        - '<gradient>|||||</gradient> &cPVP <gradient>|||||</gradient>'
+        - 'Is a very important'
+        - 'aspect of this game'
+        - ''
+        - '&c&lRIGHT CLICK HERE'
+      slot: 12
+      rightClickAction:
+        goto: swordlist
+    - type: 'BRICKS'
+      lore:
+        - ''
+        - '<gradient>|||||</gradient> &eBuilding <gradient>|||||</gradient>'
+        - 'Is a less important'
+        - 'aspect of this game'
+        - ''
+        - '&e&lCLICK HERE'
+      slot: 13
+      goto: blocklist
+    - type: 'WOODEN_HOE'
+      lore:
+        - ''
+        - '<gradient>|||||</gradient> &aFarm <gradient>|||||</gradient>'
+        - 'Is not an important'
+        - 'aspect of this game'
+        - ''
+        - '&a&lCLICK HERE'
+      slot: 14
+      goto: toollist
+    - type: 'ARROW'
+      slot: 35
+      action: BACK
+
