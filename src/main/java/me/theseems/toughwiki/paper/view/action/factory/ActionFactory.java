@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import me.theseems.toughwiki.api.view.Action;
 import me.theseems.toughwiki.api.view.TriggerType;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,13 @@ public class ActionFactory {
     }
 
     public void add(ActionProducer producer) {
+        if (producerList.contains(producer)) {
+            return;
+        }
         producerList.add(producer);
+    }
+
+    public List<ActionProducer> getProducerList() {
+        return Collections.unmodifiableList(producerList);
     }
 }

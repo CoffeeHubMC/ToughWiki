@@ -18,7 +18,7 @@ ext {
 }
 
 group = 'me.theseems'
-version = ext.devBuild ? getVersionName() : "1.2.0"
+version = ext.devBuild ? getVersionName() : "1.2.1"
 
 repositories {
     mavenCentral()

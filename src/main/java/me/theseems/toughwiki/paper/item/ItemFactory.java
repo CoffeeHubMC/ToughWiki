@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ItemFactory {
@@ -17,11 +18,25 @@ public class ItemFactory {
     }
 
     public void addInitializer(ItemInitializer initializer) {
+        if (initializerList.contains(initializer)) {
+            return;
+        }
         initializerList.add(initializer);
     }
 
     public void addTransformer(ItemTransformer transformer) {
+        if (transformerList.contains(transformer)) {
+            return;
+        }
         transformerList.add(transformer);
+    }
+
+    public List<ItemInitializer> getInitializerList() {
+        return Collections.unmodifiableList(initializerList);
+    }
+
+    public List<ItemTransformer> getTransformerList() {
+        return Collections.unmodifiableList(transformerList);
     }
 
     public ItemStack produce(Player player, WikiPageItemConfig itemConfig) {

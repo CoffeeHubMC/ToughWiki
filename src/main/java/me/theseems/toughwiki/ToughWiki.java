@@ -1,11 +1,13 @@
 package me.theseems.toughwiki;
 
+import me.theseems.toughwiki.config.CustomCommandConfig;
 import me.theseems.toughwiki.config.ToughWikiConfig;
 import me.theseems.toughwiki.impl.bootstrap.Phase;
 import me.theseems.toughwiki.impl.bootstrap.ToughWikiBootstrap;
 import me.theseems.toughwiki.impl.bootstrap.tasks.ApiInitializationTask;
 import me.theseems.toughwiki.impl.bootstrap.tasks.PageClearTask;
 import me.theseems.toughwiki.impl.bootstrap.tasks.PageViewDisposeTask;
+import me.theseems.toughwiki.paper.commands.custom.CustomCommandManager;
 import me.theseems.toughwiki.paper.item.ItemFactory;
 import me.theseems.toughwiki.paper.item.ItemFactoryInitializationTask;
 import me.theseems.toughwiki.paper.task.*;
@@ -20,6 +22,8 @@ import java.util.logging.Logger;
 
 public final class ToughWiki extends JavaPlugin {
     private static ToughWikiConfig config;
+    private static CustomCommandConfig commandConfig;
+    private static CustomCommandManager commandManager;
     private static ItemFactory itemFactory;
     private static ToughWiki plugin;
     private static ToughWikiBootstrap bootstrap;
@@ -27,6 +31,18 @@ public final class ToughWiki extends JavaPlugin {
 
     public static ToughWikiConfig getToughConfig() {
         return config;
+    }
+
+    public static CustomCommandConfig getCommandConfig() {
+        return commandConfig;
+    }
+
+    public static CustomCommandManager getCommandManager() {
+        return commandManager;
+    }
+
+    private void setCommandManager(CustomCommandManager commandManager) {
+        ToughWiki.commandManager = commandManager;
     }
 
     public static ItemFactory getItemFactory() {
@@ -68,12 +84,18 @@ public final class ToughWiki extends JavaPlugin {
         bootstrap.add(new ActionFactoryInitializationTask(this::setActionFactory));
         bootstrap.add(new ItemFactoryInitializationTask(this::setItemFactory));
 
+        bootstrap.add(new CommandConfigParseTask(new File(getDataFolder(), "commands.yml"), this::setCommandConfig));
         bootstrap.add(new ConfigParseTask(new File(getDataFolder(), "config.yml"), this::setConfig));
+
         bootstrap.add(new PageValidateTask());
         bootstrap.add(new PageRegisterTask());
         bootstrap.add(new PaperRegisterViewTask());
 
         bootstrap.add(new PaperCommandRegisterTask(plugin));
+
+        bootstrap.add(new PaperCustomCommandRegisterTask(this::setCommandManager));
+        bootstrap.add(new PaperCustomCommandUnregisterTask());
+
         bootstrap.add(new PaperListenerRegisterTask(plugin));
 
         bootstrap.add(new PaperListenerUnregisterTask());
@@ -92,5 +114,9 @@ public final class ToughWiki extends JavaPlugin {
 
     private void setConfig(ToughWikiConfig config) {
         ToughWiki.config = config;
+    }
+
+    private void setCommandConfig(CustomCommandConfig commandConfig) {
+        ToughWiki.commandConfig = commandConfig;
     }
 }

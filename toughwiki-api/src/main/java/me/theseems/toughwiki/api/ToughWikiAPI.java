@@ -1,7 +1,10 @@
 package me.theseems.toughwiki.api;
 
 import me.theseems.toughwiki.api.view.ActionEmitter;
+import me.theseems.toughwiki.api.view.WikiPageView;
 import me.theseems.toughwiki.api.view.WikiPageViewManager;
+
+import java.util.Optional;
 
 public class ToughWikiAPI {
     private static ToughWikiAPI INSTANCE;
@@ -35,5 +38,13 @@ public class ToughWikiAPI {
 
     public ActionEmitter getActionEmitter() {
         return actionEmitter;
+    }
+
+    public Optional<WikiPageView> getView(String name) {
+        return getPage(name).flatMap(viewManager::getView);
+    }
+
+    public Optional<WikiPage> getPage(String name) {
+        return pageRepository.getPage(name);
     }
 }

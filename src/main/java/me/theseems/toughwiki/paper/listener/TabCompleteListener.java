@@ -26,10 +26,12 @@ public class TabCompleteListener implements Listener {
 
         String reported = e.getBuffer().replaceFirst("/wiki ", "");
 
+        // Should've probably zipped stuff into trie (or just a map of all the possible prefixes)
+        // but im just too lazy for that.
         List<String> list = new ArrayList<>();
         for (WikiPageView view : ToughWikiAPI.getInstance().getViewManager().getAllViews()) {
             if (e.getSender().hasPermission("toughwiki.command.showpage." + view.getPage().getName())
-                    && view.getPage().getName().startsWith(reported)) {
+                    && view.getPage().getName().toLowerCase().startsWith(reported.toLowerCase())) {
                 list.add(view.getPage().getName());
             }
         }
