@@ -10,25 +10,30 @@ import java.util.Optional;
 
 public class CustomCommandManager {
     private final Map<String, ToughWikiCommandConfig> commandConfigMap;
+    private CommandMap commandMap;
 
     public CustomCommandManager(Map<String, ToughWikiCommandConfig> commandConfigMap) {
         this.commandConfigMap = commandConfigMap;
     }
 
     public void setup() {
+        this.commandMap = getCommandMap();
         commandConfigMap.forEach((s, toughWikiCommandConfig) -> {
             CustomCommand customCommand = new CustomCommand(s, toughWikiCommandConfig);
-            getCommandMap().register(s, customCommand);
-            getCommandMap().getKnownCommands().put(s, customCommand);
+            commandMap.register(s, customCommand);
+            commandMap.getKnownCommands().put(s, customCommand);
         });
     }
 
     public void dispose() {
         for (String label : commandConfigMap.keySet()) {
-            Optional.ofNullable(getCommandMap().getCommand(label))
+            Optional.ofNullable(commandMap.getCommand(label))
                     .ifPresent((command) -> {
-                        command.unregister(getCommandMap());
-                        getCommandMap().getKnownCommands().remove(label);
+                        command.unregister(commandMap);
+                        commandMap.getKnownCommands().remove(command.getLabel());
+                        for (String alias : command.getAliases()) {
+                            commandMap.getKnownCommands().remove(alias);
+                        }
                     });
         }
     }

@@ -3,7 +3,7 @@ version: '${version}'
 main: me.theseems.toughwiki.ToughWiki
 api-version: 1.18
 prefix: ToughWiki
-softdepend: [ MythicMobs, PlaceholdersAPI ]
+softdepend: [ MythicMobs, PlaceholderAPI ]
 authors: [ TheSeems ]
 description: GUI Wiki plugin with MythicMobs integration
 website: theseems.ru

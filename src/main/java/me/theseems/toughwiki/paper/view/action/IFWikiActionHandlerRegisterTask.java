@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 public class IFWikiActionHandlerRegisterTask extends BootstrapTask {
     public IFWikiActionHandlerRegisterTask() {
-        super("IFactionHandlerRegister", Phase.PRE_CONFIG);
+        super("IFActionHandlerRegister", Phase.PRE_CONFIG);
     }
 
     @Override
@@ -18,6 +18,7 @@ public class IFWikiActionHandlerRegisterTask extends BootstrapTask {
         List.of(new BackActionHandler(),
                         new CloseActionHandler(),
                         new CommandActionHandler(),
+                        new ConsoleCommandActionHandler(),
                         new GotoActionHandler(),
                         new SwitchActionHandler(),
                         new SoundHandler())

@@ -23,6 +23,7 @@ public class ActionFactoryInitializationTask extends BootstrapTask {
         actionFactory.add(new GotoActionProducer());
         actionFactory.add(new SoundActionProducer());
         actionFactory.add(new SwitchActionProducer());
+        actionFactory.add(new ConsoleCommandActionProducer());
 
         actionFactoryConsumer.accept(actionFactory);
     }

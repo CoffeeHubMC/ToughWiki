@@ -3,22 +3,20 @@ package me.theseems.toughwiki.paper.view.action.handlers;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.theseems.toughwiki.api.view.ActionSender;
 import me.theseems.toughwiki.paper.view.action.handlers.base.InventoryEventActionHandler;
-import me.theseems.toughwiki.paper.view.action.variety.CommandAction;
+import me.theseems.toughwiki.paper.view.action.variety.ConsoleCommandAction;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 
-public class CommandActionHandler extends InventoryEventActionHandler<CommandAction> {
-    public CommandActionHandler() {
-        super(CommandAction.class);
+public class ConsoleCommandActionHandler extends InventoryEventActionHandler<ConsoleCommandAction> {
+    public ConsoleCommandActionHandler() {
+        super(ConsoleCommandAction.class);
     }
 
     @Override
-    protected void handle(CommandAction action, ActionSender sender, InventoryInteractEvent event) {
+    protected void handle(ConsoleCommandAction action, ActionSender sender, InventoryInteractEvent event) {
         HumanEntity humanEntity = event.getWhoClicked();
-        humanEntity.closeInventory();
-
         if (!(humanEntity instanceof Player)) {
             return;
         }
@@ -28,6 +26,6 @@ public class CommandActionHandler extends InventoryEventActionHandler<CommandAct
             commandName = PlaceholderAPI.setPlaceholders((Player) humanEntity, commandName);
         }
 
-        ((Player) humanEntity).performCommand(commandName);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), commandName);
     }
 }

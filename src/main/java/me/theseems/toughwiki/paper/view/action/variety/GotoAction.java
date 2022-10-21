@@ -4,7 +4,7 @@ import me.theseems.toughwiki.api.view.TriggerType;
 import me.theseems.toughwiki.paper.view.action.BaseAction;
 
 public class GotoAction extends BaseAction {
-    private String gotoName;
+    private final String gotoName;
 
     public GotoAction(TriggerType triggerType, String gotoName) {
         super(triggerType);
