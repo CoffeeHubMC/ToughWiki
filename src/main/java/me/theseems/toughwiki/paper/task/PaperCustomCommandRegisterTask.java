@@ -18,8 +18,11 @@ public class PaperCustomCommandRegisterTask extends BootstrapTask {
 
     @Override
     public void run(Logger logger) {
-        CustomCommandManager customCommandManager = new CustomCommandManager(ToughWiki.getCommandConfig().getCommands());
-        customCommandManager.setup();
-        consumer.accept(customCommandManager);
+        if (ToughWiki.getCommandConfig() != null) {
+            CustomCommandManager customCommandManager =
+                    new CustomCommandManager(ToughWiki.getCommandConfig().getCommands());
+            customCommandManager.setup();
+            consumer.accept(customCommandManager);
+        }
     }
 }

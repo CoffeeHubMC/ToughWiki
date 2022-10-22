@@ -3,6 +3,7 @@ package me.theseems.toughwiki.paper.task;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import me.theseems.toughwiki.ToughWiki;
 import me.theseems.toughwiki.config.CustomCommandConfig;
 import me.theseems.toughwiki.impl.bootstrap.BootstrapTask;
 import me.theseems.toughwiki.impl.bootstrap.Phase;
@@ -30,14 +31,14 @@ public class CommandConfigParseTask extends BootstrapTask {
 
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         if (!configFile.exists()) {
-            configFile.createNewFile();
-            mapper.writeValue(configFile, new CustomCommandConfig());
+            return;
         }
 
         try {
             consumer.accept(mapper.readValue(configFile, CustomCommandConfig.class));
-        } catch (MismatchedInputException e) {
-            consumer.accept(new CustomCommandConfig());
+        } catch (Exception e) {
+            ToughWiki.getPluginLogger().warning("Could not parse the command config: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
