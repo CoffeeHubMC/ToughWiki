@@ -29,5 +29,6 @@ public class CommandActionHandler extends InventoryEventActionHandler<CommandAct
         }
 
         ((Player) humanEntity).performCommand(commandName);
+        humanEntity.closeInventory();
     }
 }

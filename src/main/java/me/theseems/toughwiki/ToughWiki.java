@@ -41,24 +41,12 @@ public final class ToughWiki extends JavaPlugin {
         return commandManager;
     }
 
-    private void setCommandManager(CustomCommandManager commandManager) {
-        ToughWiki.commandManager = commandManager;
-    }
-
     public static ItemFactory getItemFactory() {
         return itemFactory;
     }
 
-    private void setItemFactory(ItemFactory itemFactory) {
-        ToughWiki.itemFactory = itemFactory;
-    }
-
     public static ActionFactory getActionFactory() {
         return actionFactory;
-    }
-
-    private void setActionFactory(ActionFactory actionFactory) {
-        ToughWiki.actionFactory = actionFactory;
     }
 
     public static @NotNull Logger getPluginLogger() {
@@ -110,6 +98,18 @@ public final class ToughWiki extends JavaPlugin {
     @Override
     public void onDisable() {
         bootstrap.execute(Phase.SHUTDOWN);
+    }
+
+    private void setCommandManager(CustomCommandManager commandManager) {
+        ToughWiki.commandManager = commandManager;
+    }
+
+    private void setItemFactory(ItemFactory itemFactory) {
+        ToughWiki.itemFactory = itemFactory;
+    }
+
+    private void setActionFactory(ActionFactory actionFactory) {
+        ToughWiki.actionFactory = actionFactory;
     }
 
     private void setConfig(ToughWikiConfig config) {

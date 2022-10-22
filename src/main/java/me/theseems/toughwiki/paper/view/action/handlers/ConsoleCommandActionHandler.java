@@ -27,5 +27,6 @@ public class ConsoleCommandActionHandler extends InventoryEventActionHandler<Con
         }
 
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), commandName);
+        humanEntity.closeInventory();
     }
 }
